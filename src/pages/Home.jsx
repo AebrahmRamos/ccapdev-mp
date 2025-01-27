@@ -1,33 +1,33 @@
-import Hero from '../components/Hero';
-import CafeSection from '../components/CafeSection';
+import Hero from "../components/Hero";
+import CafeSection from "../components/CafeSection";
 
 const trendingCafes = [
   {
-    image: '/images/cafe1.jpg',
-    title: 'Coffee Project Black',
+    image: "src/images/cafe1.jpg",
+    title: "Elsewhere Café",
   },
   {
-    image: '/images/cafe2.jpg',
-    title: 'Starbucks Reserve',
+    image: "src/images/cafe2.jpg",
+    title: "Starbucks Reserve",
   },
   {
-    image: '/images/cafe3.jpg',
-    title: 'The Coffee Academics',
+    image: "src/images/cafe3.jpg",
+    title: "The Coffee Academics",
   },
 ];
 
 const studyCafes = [
   {
-    image: '/images/study1.jpg',
-    title: 'Bo\'s Coffee',
+    image: "src/images/cafe4.jpg",
+    title: "Bo's Coffee",
   },
   {
-    image: '/images/study2.jpg',
-    title: 'Seattle\'s Best',
+    image: "src/images/cafe5.jpg",
+    title: "Seattle's Best",
   },
   {
-    image: '/images/study3.jpg',
-    title: 'CBTL',
+    image: "src/images/cafe6.jpg",
+    title: "CBTL",
   },
 ];
 
@@ -35,12 +35,12 @@ const Home = () => {
   return (
     <>
       <Hero />
-      <CafeSection 
+      <CafeSection
         title="TRENDING CAFES"
         subtitle="Explore the most popular cafés near DLSU"
         cafes={trendingCafes}
       />
-      <CafeSection 
+      <CafeSection
         title="BEST FOR STUDYING"
         subtitle="Explore top-rated study-friendly cafés"
         cafes={studyCafes}

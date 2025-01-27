@@ -1,6 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Glegoo:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cantata+One&family=Glegoo:wght@400;700&display=swap");
+
 .cafe-section {
+  margin-top: -18px;
   padding: 4rem 2rem;
-  background-color: #FAF6F1;
+  background-color: #eae1d2;
 }
 
 .section-header {
@@ -10,14 +14,15 @@
 
 .section-header h2 {
   font-size: 2rem;
-  color: #4A3B2A;
+  color: #4a3b2a;
   margin-bottom: 0.5rem;
-  font-family: 'Playfair Display', serif;
+  font-family: "Glegoo", serif;
 }
 
 .section-header p {
   color: #666;
   font-size: 1.1rem;
+  font-family: "Cantata One", serif;
 }
 
 .cafe-grid {
@@ -34,6 +39,7 @@
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
+  font-family: "Glegoo", serif;
 }
 
 .cafe-card:hover {
@@ -49,7 +55,7 @@
 .cafe-card h3 {
   padding: 1rem;
   margin: 0;
-  color: #4A3B2A;
+  color: #4a3b2a;
   font-size: 1.2rem;
   text-align: center;
 }

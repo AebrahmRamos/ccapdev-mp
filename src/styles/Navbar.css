@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Cantata+One&family=Glegoo:wght@400;700&display=swap");
+
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -18,9 +20,9 @@
 }
 
 .logo {
-  color: #4A3B2A;
+  color: #4a3b2a;
   text-decoration: none;
-  font-family: 'Playfair Display', serif;
+  font-family: "Canata One", serif;
 }
 
 .nav-links {
@@ -29,12 +31,13 @@
 }
 
 .nav-links a {
-  color: #4A3B2A;
+  color: #4a3b2a;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
+  font-family: "Canata One", serif;
 }
 
 .nav-links a:hover {
-  color: #8B7355;
+  color: #8b7355;
 }

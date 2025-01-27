@@ -5,15 +5,15 @@
 }
 
 :root {
-  --primary-color: #4A3B2A;
-  --secondary-color: #8B7355;
-  --background-color: #FAF6F1;
+  --primary-color: #4a3b2a;
+  --secondary-color: #8b7355;
+  --background-color: #eae1d2;
   --text-color: #333;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

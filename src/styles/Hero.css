@@ -1,13 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=Cantata+One&family=Glegoo:wght@400;700&display=swap");
+
 .hero {
-  height: 100vh;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/hero-bg.jpg');
-  background-size: cover;
+  margin-top: -18px;
+  height: 45vh;
   background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
+  width: 100%;
   color: white;
+  opacity: 76%;
 }
 
 .hero-content {
@@ -19,20 +21,26 @@
   font-size: 3.5rem;
   font-weight: bold;
   margin-bottom: 2rem;
-  font-family: 'Playfair Display', serif;
+  font-family: "Cantata One", serif;
 }
 
 .cta-button {
   display: inline-block;
   padding: 1rem 2rem;
-  background-color: #8B7355;
+  background-color: #8b7355;
   color: white;
   text-decoration: none;
   border-radius: 30px;
   font-weight: 600;
+  font-family: "Cantata One", serif;
   transition: background-color 0.3s ease;
 }
 
 .cta-button:hover {
-  background-color: #4A3B2A;
+  background-color: #4a3b2a;
+}
+
+#hero_image {
+  background-image: url("../images/coffee_hero.png");
+  background-size: cover;
 }
