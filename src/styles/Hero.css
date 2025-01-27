@@ -44,3 +44,36 @@
   background-image: url("../images/coffee_hero.png");
   background-size: cover;
 }
+
+/* Media queries for responsive design */
+@media screen and (max-width: 768px) {
+  .hero {
+    height: 40vh;
+  }
+
+  .hero-content {
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .hero {
+    height: 35vh;
+  }
+
+  .hero-content h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+}
