@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Login from "./pages/Login";
 import CafePage from "./pages/CafePage";
+import ReviewSubmission from "./pages/ReviewSubmission";
 import cafeData from "./data/Cafes.json";
 import "./App.css";
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/submit-review" element={<ReviewSubmission />} />
           {cafeData.map((cafe) => (
             <Route
               key={cafe.id}

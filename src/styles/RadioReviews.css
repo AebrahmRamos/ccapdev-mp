@@ -1,0 +1,84 @@
+@import url("https://fonts.googleapis.com/css2?family=Cantata+One&family=Glegoo:wght@400;700&display=swap");
+
+.cafe-details-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.ambience-section,
+.pricing-section,
+.wifi-section,
+.outlets-section,
+.seating-section {
+  width: 100%;
+  max-width: 700px; /* Increased max-width to accommodate more options */
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.ambience-section label,
+.pricing-section label,
+.wifi-section label,
+.outlets-section label,
+.seating-section label {
+  margin-right: 1rem;
+  min-width: 100px;
+  text-align: right;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%; /* Ensure full width of container */
+  justify-content: flex-start; /* Align items to the start */
+}
+
+.radio-group > label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.5rem;
+  min-width: 120px; /* Ensures consistent width */
+  height: 2rem;
+  line-height: 2rem;
+  white-space: nowrap;
+}
+
+.radio-group input[type="radio"] {
+  margin-right: 0.25rem;
+}
+
+@media (max-width: 600px) {
+  .ambience-section,
+  .pricing-section,
+  .wifi-section,
+  .outlets-section,
+  .seating-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ambience-section label,
+  .pricing-section label,
+  .wifi-section label,
+  .outlets-section label,
+  .seating-section label {
+    text-align: left;
+    margin-bottom: 0.5rem;
+  }
+
+  .radio-group {
+    flex-wrap: wrap;
+  }
+
+  .radio-group > label {
+    min-width: auto;
+    white-space: normal;
+  }
+}
