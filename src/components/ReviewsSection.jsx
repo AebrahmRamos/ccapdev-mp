@@ -1,6 +1,6 @@
-import React from 'react';
-import styles from '../styles/CafeDetails.module.css';
-import { ReviewCard } from './ReviewCard';
+import React from "react";
+import styles from "../styles/CafeDetails.module.css";
+import { ReviewCard } from "./ReviewCard";
 
 export function ReviewsSection({ reviews }) {
   return (

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import styles from '../styles/CafeDetails.module.css';
+import React, { useState } from "react";
+import styles from "../styles/CafeDetails.module.css";
 
 export function ImageGallery({ images }) {
   const IMAGES_PER_VIEW = 4;
@@ -8,26 +8,32 @@ export function ImageGallery({ images }) {
   const handlePrevious = () => {
     setCurrentIndex((prevIndex) => {
       const newIndex = prevIndex - 1;
-      return newIndex < 0 ? Math.max(0, images.length - IMAGES_PER_VIEW) : newIndex;
+      return newIndex < 0
+      ? Math.max(0, images.length - IMAGES_PER_VIEW)
+      : newIndex;
     });
   };
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => {
       const newIndex = prevIndex + 1;
-      return newIndex > images.length - IMAGES_PER_VIEW ? 0 : newIndex;
+      return newIndex > images.length - IMAGES_PER_VIEW? 0: newIndex;
     });
   };
 
-  const visibleImages = images.slice(currentIndex, currentIndex + IMAGES_PER_VIEW);
+  const visibleImages = images.slice(
+    currentIndex,
+    currentIndex + IMAGES_PER_VIEW
+  );
 
   // Handle edge cases where images.length < IMAGES_PER_VIEW
-  const displayImages = images.length < IMAGES_PER_VIEW ? images : visibleImages;
-
+  const displayImages =
+    images.length < IMAGES_PER_VIEW? images: visibleImages;
 
   return (
     <div className={styles.galleryWrapper}>
-      {images.length > IMAGES_PER_VIEW && ( // Conditionally render buttons
+      {images.length > IMAGES_PER_VIEW && (
+        // Conditionally render buttons
         <button
           onClick={handlePrevious}
           className={styles.galleryButton}
@@ -39,15 +45,17 @@ export function ImageGallery({ images }) {
       <div className={styles.galleryContainer}>
         {displayImages.map((image, index) => (
           <div key={`${currentIndex}-${index}`} className={styles.galleryItem}>
+            {/* Replace with actual image fetching logic */}
             <img
-              src={image}
+              src={`/images/cafe/${image}`}
               alt={`Cafe interior view ${index + 1}`}
               className={styles.galleryImage}
             />
           </div>
         ))}
       </div>
-       {images.length > IMAGES_PER_VIEW && ( // Conditionally render buttons
+      {images.length > IMAGES_PER_VIEW && (
+        // Conditionally render buttons
         <button
           onClick={handleNext}
           className={styles.galleryButton}

@@ -108,8 +108,8 @@
 .cafeImage {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 50%;
-  object-fit: contain;
+  border-radius: 8px;
+  object-fit: cover;
   margin-top: 4px;
 }
 
