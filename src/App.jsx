@@ -7,7 +7,6 @@ import About from "./pages/About";
 import Login from "./pages/Login";
 import CafePage from "./pages/CafePage";
 import cafeData from "./data/Cafes.json";
-import ReviewSubmission from "./pages/ReviewSubmission";
 import "./App.css";
 
 function App() {
