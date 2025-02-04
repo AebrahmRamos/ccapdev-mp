@@ -7,7 +7,7 @@
 
 .headerContainer {
   background: rgba(234, 225, 210, 1);
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
   margin-top: 11px;
   width: 100%;
   padding: 43px 57px;
@@ -41,7 +41,7 @@
 .cafeName {
   color: rgba(62, 47, 40, 1);
   text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  font: 700 48px Glegoo, sans-serif;
+  font: 700 Glegoo, sans-serif;
   flex-grow: 1;
   width: 100%;
 }
@@ -50,7 +50,7 @@
   display: flex;
   align-items: center;
   gap: 13px;
-  font: 400 20px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+  font: 400 Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
   margin: auto 0;
   width: 100%;
 }
@@ -76,7 +76,7 @@
 .hoursSection {
   color: rgba(86, 41, 22, 1);
   margin-top: 54px;
-  font: 400 16px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+  font: 400 Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
   display: flex;
   flex-direction: row;
 }
@@ -117,7 +117,7 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-top: 54px;
+  margin: 54px;
   padding: 0 57px;
 }
 
@@ -155,7 +155,7 @@
   border: none;
   border-radius: 50%;
   width: 40px;
-  height: 40px;
+  /* height: 40px; */
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -173,14 +173,14 @@
   background: rgba(200, 184, 159, 1);
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   color: rgba(86, 41, 22, 1);
-  text-align: center;
+  text-align: left;
   padding: 40px;
-  font: 400 36px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+  font: Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
 }
 
 .reviewCard {
   background: rgba(234, 225, 210, 1);
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
   padding: 30px 58px;
   margin-bottom: 20px;
 }
@@ -191,10 +191,17 @@
 }
 
 .reviewerImage {
-  width: 112px;
-  aspect-ratio: 1;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  object-fit: contain;
+  object-fit: cover;
+}
+
+@media (max-width: 991px) {
+  .reviewerImage {
+    width: 60px;
+    height: 60px;
+  }
 }
 
 .reviewerInfo {
@@ -204,7 +211,6 @@
 .reviewerMeta {
   display: flex;
   justify-content: space-between;
-  font-size: 24px;
   color: rgba(86, 41, 22, 1);
 }
 
@@ -218,25 +224,28 @@
 .amenityRating {
   color: rgba(81, 46, 26, 1);
   margin-top: 19px;
-  font: 400 20px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+  font: 400 Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
 }
 
 .amenityDetails {
   color: rgba(81, 46, 26, 1);
-  font: 400 20px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
-  margin: 10px 0 0 141px;
+  font: 400 Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+  /* margin: 10px 0 0 141px; */
+  text-align: left;
 }
 
 .reviewText {
   color: rgba(0, 0, 0, 1);
-  font: 400 24px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+  font: 400 Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
   margin-top: 31px;
+  text-align: left;
 }
 
 .reviewImages {
   display: flex;
   gap: 20px;
-  margin: 49px 0 0 134px;
+  margin: 49px 0 0 0px;
+  justify-content: left;
 }
 
 .reviewImage {
@@ -247,7 +256,7 @@
 
 .helpfulButton {
   color: rgba(86, 41, 22, 1);
-  font: 400 24px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+  font: 400 Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
   background: none;
   border: none;
   cursor: pointer;
@@ -279,7 +288,7 @@
   }
   
   .cafeName {
-    font-size: 40px;
+    font-size: inherit;
   }
   
   .hoursSection {

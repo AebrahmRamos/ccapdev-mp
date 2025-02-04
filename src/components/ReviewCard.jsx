@@ -22,32 +22,31 @@ export function ReviewCard({
           alt={`${name}'s profile`}
           className={styles.reviewerImage}
         />
-        <div className={styles.reviewerInfo}>
-          <div className={styles.reviewerMeta}>
-            <span>{name}</span>
-            <span>{date}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+          <div className={styles.reviewerInfo}>
+            <div className={styles.reviewerMeta}>
+              <span>{name}</span>
+              <span>{date}</span>
+            </div>
+            <div className={styles.ratingDisplay}>
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets/TEMP/2e3cb4ba77b7a9e43e6a58691e9e2f820eebd3eb5244d80c29a4fe52a539c84e?placeholderIfAbsent=true&apiKey=99eff07de93a442a8e01c5af4301b6ea"
+                alt="Rating stars"
+                className={styles.ratingStars}
+              />
+              <span>({rating})</span>
+            </div>
           </div>
-          <div className={styles.ratingDisplay}>
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/2e3cb4ba77b7a9e43e6a58691e9e2f820eebd3eb5244d80c29a4fe52a539c84e?placeholderIfAbsent=true&apiKey=99eff07de93a442a8e01c5af4301b6ea"
-              alt="Rating stars"
-              className={styles.ratingStars}
-            />
-            <span>({rating})</span>
-          </div>
-          <div className={styles.amenityRating}>
-            Ambiance Rating: {ambiance}
-          </div>
-          <div className={styles.amenityRating}>
-            Pricing Range: {pricing}
+          <div className={styles.amenityDetails}>
+            <div><strong >Ambiance:</strong> {ambiance}</div>
+            <div><strong>Pricing:</strong> {pricing}</div>
+            <div><strong>Wi-Fi Strength:</strong> {wifi}</div>
+            <div><strong>Charging Outlets:</strong> {outlets}</div>
+            <div><strong>Seating:</strong> {seating}</div>
           </div>
         </div>
       </div>
-      <div className={styles.amenityDetails}>
-        <div>Wi-Fi Strength: {wifi}</div>
-        <div>Charging Outlets: {outlets}</div>
-        <div>Seating: {seating}</div>
-      </div>
+      
       <p className={styles.reviewText}>{review}</p>
       {images && (
         <div className={styles.reviewImages}>
