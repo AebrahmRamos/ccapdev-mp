@@ -1,0 +1,323 @@
+.cafeDetailsPage {
+  background: rgba(234, 225, 210, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.headerContainer {
+  background: rgba(234, 225, 210, 1);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  margin-top: 11px;
+  width: 100%;
+  padding: 43px 57px;
+}
+
+.headerContent {
+  width: 100%;
+  max-width: 1267px;
+}
+
+.headerLayout {
+  display: flex;
+  gap: 20px;
+}
+
+.infoColumn {
+  width: 72%;
+}
+
+.imageColumn {
+  width: 28%;
+}
+
+.titleSection {
+  display: flex;
+  text-align: center;
+  flex-wrap: wrap;
+  text-align: left;
+}
+
+.cafeName {
+  color: rgba(62, 47, 40, 1);
+  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  font: 700 48px Glegoo, sans-serif;
+  flex-grow: 1;
+  width: 100%;
+}
+
+.ratingContainer {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font: 400 20px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+  margin: auto 0;
+  width: 100%;
+}
+
+.ratingStars {
+  width: 150px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.ratingScore {
+  color: rgba(107, 112, 80, 1);
+}
+
+.reviewCount {
+  color: rgba(81, 46, 26, 1);
+}
+
+.address span {
+  text-align: left;
+}
+
+.hoursSection {
+  color: rgba(86, 41, 22, 1);
+  margin-top: 54px;
+  font: 400 16px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+  display: flex;
+  flex-direction: row;
+}
+
+.hoursTitle {
+  text-align: right;
+}
+
+.hoursList {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.hoursDay {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  justify-content: space-between;
+}
+
+.hoursTime {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  justify-content: space-between;
+}
+
+.cafeImage {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: contain;
+  margin-top: 4px;
+}
+
+.galleryWrapper {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 54px;
+  padding: 0 57px;
+}
+
+.galleryContainer {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  gap: 20px;
+}
+
+.galleryItem {
+  flex: 0 0 calc(25% - 20px);
+  scroll-snap-align: start;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.galleryImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.galleryImage:hover {
+  transform: scale(1.05);
+}
+
+.galleryButton {
+  background: rgba(86, 41, 22, 1);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: background-color 0.3s ease;
+  z-index: 1;
+}
+
+.galleryButton:hover {
+  background: rgba(107, 112, 80, 1);
+}
+
+.reviewsTitle {
+  background: rgba(200, 184, 159, 1);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  color: rgba(86, 41, 22, 1);
+  text-align: center;
+  padding: 40px;
+  font: 400 36px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+}
+
+.reviewCard {
+  background: rgba(234, 225, 210, 1);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  padding: 30px 58px;
+  margin-bottom: 20px;
+}
+
+.reviewHeader {
+  display: flex;
+  gap: 22px;
+}
+
+.reviewerImage {
+  width: 112px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: contain;
+}
+
+.reviewerInfo {
+  flex-grow: 1;
+}
+
+.reviewerMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 24px;
+  color: rgba(86, 41, 22, 1);
+}
+
+.ratingDisplay {
+  display: flex;
+  gap: 7px;
+  color: rgba(107, 112, 80, 1);
+  margin-top: 9px;
+}
+
+.amenityRating {
+  color: rgba(81, 46, 26, 1);
+  margin-top: 19px;
+  font: 400 20px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+}
+
+.amenityDetails {
+  color: rgba(81, 46, 26, 1);
+  font: 400 20px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+  margin: 10px 0 0 141px;
+}
+
+.reviewText {
+  color: rgba(0, 0, 0, 1);
+  font: 400 24px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+  margin-top: 31px;
+}
+
+.reviewImages {
+  display: flex;
+  gap: 20px;
+  margin: 49px 0 0 134px;
+}
+
+.reviewImage {
+  width: 124px;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.helpfulButton {
+  color: rgba(86, 41, 22, 1);
+  font: 400 24px Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin: 88px 0 0 139px;
+  padding: 10px;
+}
+
+.helpfulButton:hover {
+  opacity: 0.8;
+}
+
+.helpfulButton:focus {
+  outline: 2px solid rgba(86, 41, 22, 1);
+  border-radius: 4px;
+}
+
+@media (max-width: 991px) {
+  .headerContainer {
+    padding: 20px;
+  }
+  
+  .headerLayout {
+    flex-direction: column;
+  }
+  
+  .infoColumn,
+  .imageColumn {
+    width: 100%;
+  }
+  
+  .cafeName {
+    font-size: 40px;
+  }
+  
+  .hoursSection {
+    margin-top: 40px;
+  }
+  
+  .cafeImage {
+    margin-top: 40px;
+  }
+  
+  .galleryContainer {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    max-width: 1200px;
+    width: 100%;
+  }
+
+  .galleryItem {
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  }
+  
+  .reviewCard {
+    padding: 20px;
+  }
+  
+  .amenityDetails {
+    margin-left: 10px;
+  }
+  
+  .reviewImages {
+    margin: 40px 0 0 10px;
+  }
+  
+  .helpfulButton {
+    margin: 40px 0 0 10px;
+  }
+}

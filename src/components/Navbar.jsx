@@ -23,6 +23,7 @@ const Navbar = () => {
         <Link to="/" onClick={() => setIsMenuOpen(false)}>Home</Link>
         <Link to="/about" onClick={() => setIsMenuOpen(false)}>About</Link>
         <Link to="/login" onClick={() => setIsMenuOpen(false)}>Log In</Link>
+        <Link to="/cbtl"  onClick={() => setIsMenuOpen(false)}>Sample Cafe</Link>
       </div>
     </nav>
   );
