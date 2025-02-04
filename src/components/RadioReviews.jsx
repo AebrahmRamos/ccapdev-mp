@@ -12,7 +12,7 @@ const RadioReviews = ({ cafeDetails, onChange }) => {
               type="radio" 
               name="ambience" 
               value="cozy"
-              checked={cafeDetails.ambience === 'study-friendly'}
+              checked={cafeDetails.ambience === 'cozy'}
               onChange={onChange}
             /> Cozy
           </label>
@@ -21,7 +21,7 @@ const RadioReviews = ({ cafeDetails, onChange }) => {
               type="radio" 
               name="ambience" 
               value="lively"
-              checked={cafeDetails.ambience === 'social'}
+              checked={cafeDetails.ambience === 'lively'}
               onChange={onChange}
             /> Lively
           </label>
@@ -69,7 +69,7 @@ const RadioReviews = ({ cafeDetails, onChange }) => {
               type="radio" 
               name="wifi" 
               value="fast & stable"
-              checked={cafeDetails.wifi === 'yes'}
+              checked={cafeDetails.wifi === 'fast & stable'}
               onChange={onChange}
             /> Fast & Stable
           </label>
@@ -78,7 +78,7 @@ const RadioReviews = ({ cafeDetails, onChange }) => {
               type="radio" 
               name="wifi" 
               value="slow"
-              checked={cafeDetails.wifi === 'no'}
+              checked={cafeDetails.wifi === 'slow'}
               onChange={onChange}
             /> Slow
           </label>
@@ -87,7 +87,7 @@ const RadioReviews = ({ cafeDetails, onChange }) => {
               type="radio" 
               name="wifi" 
               value="no wifi"
-              checked={cafeDetails.wifi === 'no'}
+              checked={cafeDetails.wifi === 'no wifi'}
               onChange={onChange}
             /> No WiFi
           </label>
@@ -102,7 +102,7 @@ const RadioReviews = ({ cafeDetails, onChange }) => {
               type="radio" 
               name="outlets" 
               value="plenty"
-              checked={cafeDetails.outlets === 'yes'}
+              checked={cafeDetails.outlets === 'plenty'}
               onChange={onChange}
             /> Plenty
           </label>
@@ -111,7 +111,7 @@ const RadioReviews = ({ cafeDetails, onChange }) => {
               type="radio" 
               name="outlets" 
               value="limited"
-              checked={cafeDetails.outlets === 'no'}
+              checked={cafeDetails.outlets === 'limited'}
               onChange={onChange}
             /> Limited
           </label>
@@ -120,7 +120,7 @@ const RadioReviews = ({ cafeDetails, onChange }) => {
               type="radio" 
               name="outlets" 
               value="none"
-              checked={cafeDetails.outlets === 'no'}
+              checked={cafeDetails.outlets === 'none'}
               onChange={onChange}
             /> None
           </label>
@@ -135,7 +135,7 @@ const RadioReviews = ({ cafeDetails, onChange }) => {
               type="radio" 
               name="seating" 
               value="spacious"
-              checked={cafeDetails.seating === 'yes'}
+              checked={cafeDetails.seating === 'spacious'}
               onChange={onChange}
             /> Spacious
           </label>
@@ -144,7 +144,7 @@ const RadioReviews = ({ cafeDetails, onChange }) => {
               type="radio" 
               name="seating" 
               value="cramped"
-              checked={cafeDetails.seating === 'no'}
+              checked={cafeDetails.seating === 'cramped'}
               onChange={onChange}
             /> Cramped
           </label>

@@ -9,6 +9,9 @@ const ReviewSubmission = () => {
   const [cafeDetails, setCafeDetails] = useState({
     ambience: '',
     pricing: '',
+    wifi: '',
+    outlets: '',
+    seating: ''
   });
   const [reviewText, setReviewText] = useState('');
 
