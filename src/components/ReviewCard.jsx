@@ -2,19 +2,16 @@ import React from "react";
 import styles from "../styles/CafeDetails.module.css";
 
 export function ReviewCard({
-  user, // Changed from name to user to match JSON structure
+  user,
   date,
   rating,
-  // Assuming profileImage is now part of the review data
   profileImage,
-  comment, // Changed from review to comment to match JSON structure
-  // Assuming ambiance, pricing, wifi, outlets, seating are now part of the review data
+  comment,
   ambiance,
   pricing,
   wifi,
   outlets,
   seating,
-  // Assuming images is now part of the review data
   images,
 }) {
   return (

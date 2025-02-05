@@ -10,6 +10,7 @@ import ReviewSubmission from "./pages/ReviewSubmission";
 import cafeData from "./data/Cafes.json";
 import CafeListing from "./pages/CafeListing";
 import Footer from "./components/Footer";
+import Profile from "./pages/Profile";
 import "./App.css";
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
               />
             ))}
             <Route path="/signup" element={<Signup />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </div>
         <Footer />

@@ -3,7 +3,7 @@
         "id": 1,
         "cafeName": "The Coffee Bean & Tea Leaf",
         "category": "Coffee Shop",
-        "totalReviews": 42,
+        "totalReviews": 2,
         "averageReview": 4.5,
         "address": "G/F, Henry Sy Sr. Hall, De La Salle University, Taft Ave, Malate, Manila, 1004 Metro Manila",
         "operatingHours": {
@@ -25,13 +25,23 @@
                 "user": "John Doe",
                 "rating": 5,
                 "comment": "Great coffee and atmosphere!",
-                "date": "2024-01-15"
+                "date": "2024-01-15",
+                "ambiance": "student friendly",
+                "pricing": "affordable",
+                "wifi": "fast & stable",
+                "outlets": "limited",
+                "seating": "plenty"
             },
             {
                 "user": "Jane Smith",
                 "rating": 4,
                 "comment": "A bit pricey, but the quality is good.",
-                "date": "2024-02-28"
+                "date": "2024-02-28",
+                "ambiance": "social",
+                "pricing": "expensive",
+                "wifi": "fast & stable",
+                "outlets": "limited",
+                "seating": "plenty"
             }
         ]
     },
@@ -60,13 +70,23 @@
                 "user": "Alice Johnson",
                 "rating": 4,
                 "comment": "Love their seasonal drinks!",
-                "date": "2023-12-25"
+                "date": "2023-12-25",
+                "ambiance": "social",
+                "pricing": "expensive",
+                "wifi": "fast & stable",
+                "outlets": "plenty",
+                "seating": "plenty"
             },
             {
                 "user": "Bob Williams",
                 "rating": 4,
                 "comment": "Always a reliable choice.",
-                "date": "2024-01-08"
+                "date": "2024-01-08",
+                "ambiance": "social",
+                "pricing": "expensive",
+                "wifi": "fast & stable",
+                "outlets": "plenty",
+                "seating": "plenty"
             }
         ]
     },
@@ -95,13 +115,23 @@
                 "user": "Carlos Reyes",
                 "rating": 5,
                 "comment": "Great place to relax and have coffee.",
-                "date": "2024-01-10"
+                "date": "2024-01-10",
+                "ambiance": "student friendly",
+                "pricing": "affordable",
+                "wifi": "fast & stable",
+                "outlets": "plenty",
+                "seating": "plenty"
             },
             {
                 "user": "Maria Santos",
                 "rating": 4,
                 "comment": "Nice ambiance and good coffee.",
-                "date": "2024-02-05"
+                "date": "2024-02-05",
+                "ambiance": "social",
+                "pricing": "affordable",
+                "wifi": "fast & stable",
+                "outlets": "limited",
+                "seating": "plenty"
             }
         ]
     },
@@ -130,13 +160,23 @@
                 "user": "Anna Cruz",
                 "rating": 5,
                 "comment": "Best coffee in town!",
-                "date": "2024-01-20"
+                "date": "2024-01-20",
+                "ambiance": "student friendly",
+                "pricing": "affordable",
+                "wifi": "fast & stable",
+                "outlets": "plenty",
+                "seating": "plenty"
             },
             {
                 "user": "Mark Lim",
                 "rating": 4,
                 "comment": "Good coffee but a bit crowded.",
-                "date": "2024-02-15"
+                "date": "2024-02-15",
+                "ambiance": "social",
+                "pricing": "expensive",
+                "wifi": "fast & stable",
+                "outlets": "limited",
+                "seating": "plenty"
             }
         ]
     },
@@ -165,13 +205,23 @@
                 "user": "Liza Tan",
                 "rating": 4,
                 "comment": "Great donuts and coffee.",
-                "date": "2024-01-25"
+                "date": "2024-01-25",
+                "ambiance": "social",
+                "pricing": "affordable",
+                "wifi": "fast & stable",
+                "outlets": "limited",
+                "seating": "plenty"
             },
             {
                 "user": "James Lee",
                 "rating": 4,
                 "comment": "Good place for a quick coffee.",
-                "date": "2024-02-10"
+                "date": "2024-02-10",
+                "ambiance": "social",
+                "pricing": "affordable",
+                "wifi": "fast & stable",
+                "outlets": "limited",
+                "seating": "plenty"
             }
         ]
     },
@@ -200,13 +250,23 @@
                 "user": "Karen Mendoza",
                 "rating": 4,
                 "comment": "Affordable and tasty coffee.",
-                "date": "2024-01-30"
+                "date": "2024-01-30",
+                "ambiance": "social",
+                "pricing": "cheap",
+                "wifi": "fast & stable",
+                "outlets": "limited",
+                "seating": "plenty"
             },
             {
                 "user": "Paul Garcia",
                 "rating": 4,
                 "comment": "Good coffee and donuts.",
-                "date": "2024-02-20"
+                "date": "2024-02-20",
+                "ambiance": "social",
+                "pricing": "cheap",
+                "wifi": "fast & stable",
+                "outlets": "limited",
+                "seating": "plenty"
             }
         ]
     }

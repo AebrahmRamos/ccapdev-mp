@@ -5,7 +5,7 @@ import { ReviewCard } from "./ReviewCard";
 export function ReviewsSection({ reviews }) {
   return (
     <div className={styles.reviewsSection}>
-      <h2 className={styles.reviewsTitle}>User Reviews</h2>
+      <h2 className={styles.reviewsTitle}>Reviews</h2>
       <div className={styles.reviewsList}>
         {reviews.map((review, index) => (
           <ReviewCard key={index} {...review} />
