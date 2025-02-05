@@ -46,11 +46,12 @@ export default function CafeListing() {
             </div>
             <div className="cafe-grid">
                 {filteredCafes.map((cafe) => (
-                    <CafeCard 
-                        key={cafe.id}
-                        image={`/images/cafe/${cafe.photos[0]}`}
-                        title={cafe.cafeName} 
-                    />
+                    <a href={`/cafe/${cafe.id}`} key={cafe.id}>
+                        <CafeCard 
+                            image={`/images/cafe/${cafe.photos[0]}`}
+                            title={cafe.cafeName} 
+                        />
+                    </a>
                 ))}
             </div>
         </section>
