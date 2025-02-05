@@ -2,6 +2,7 @@
     {
         "id": 1,
         "cafeName": "The Coffee Bean & Tea Leaf",
+        "category": "Coffee Shop",
         "totalReviews": 42,
         "averageReview": 4.5,
         "address": "G/F, Henry Sy Sr. Hall, De La Salle University, Taft Ave, Malate, Manila, 1004 Metro Manila",
@@ -37,6 +38,7 @@
     {
         "id": 2,
         "cafeName": "Starbucks",
+        "category": "Coffee Shop",
         "totalReviews": 65,
         "averageReview": 4.2,
         "address": "2/F, De La Salle University - Manila, Taft Ave, Malate, Manila, 1004 Metro Manila",
@@ -71,6 +73,7 @@
     {
         "id": 3,
         "cafeName": "Bo's Coffee",
+        "category": "Coffee Shop",
         "totalReviews": 30,
         "averageReview": 4.3,
         "address": "Robinsons Place Manila, Pedro Gil St, Ermita, Manila, 1000 Metro Manila",
@@ -105,6 +108,7 @@
     {
         "id": 4,
         "cafeName": "Seattle's Best Coffee",
+        "category": "Coffee Shop",
         "totalReviews": 50,
         "averageReview": 4.4,
         "address": "SM Mall of Asia, Pasay, Metro Manila",
@@ -139,6 +143,7 @@
     {
         "id": 5,
         "cafeName": "Tim Hortons",
+        "category": "Coffee Shop",
         "totalReviews": 45,
         "averageReview": 4.1,
         "address": "Glorietta 4, Ayala Center, Makati, Metro Manila",
@@ -173,6 +178,7 @@
     {
         "id": 6,
         "cafeName": "Dunkin' Donuts",
+        "category": "Donut Shop",
         "totalReviews": 60,
         "averageReview": 4.0,
         "address": "Greenbelt 1, Ayala Center, Makati, Metro Manila",

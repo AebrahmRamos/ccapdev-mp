@@ -8,6 +8,8 @@ import Login from "./pages/Login";
 import CafePage from "./pages/CafePage";
 import ReviewSubmission from "./pages/ReviewSubmission";
 import cafeData from "./data/Cafes.json";
+import CafeListing from "./pages/CafeListing";
+import Footer from "./components/Footer";
 import "./App.css";
 
 function App() {
@@ -15,20 +17,24 @@ function App() {
     <Router>
       <div className="app">
         <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/submit-review" element={<ReviewSubmission />} />
-          {cafeData.map((cafe) => (
-            <Route
-              key={cafe.id}
-              path={`/cafe/${cafe.id}`}
-              element={<CafePage cafe={cafe} />}
-            />
-          ))}
-          <Route path="/signup" element={<Signup />} />
-        </Routes>
+        <div className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/submit-review" element={<ReviewSubmission />} />
+            <Route path="/cafes" element={<CafeListing />} />
+            {cafeData.map((cafe) => (
+              <Route
+                key={cafe.id}
+                path={`/cafe/${cafe.id}`}
+                element={<CafePage cafe={cafe} />}
+              />
+            ))}
+            <Route path="/signup" element={<Signup />} />
+          </Routes>
+        </div>
+        <Footer />
       </div>
     </Router>
   );

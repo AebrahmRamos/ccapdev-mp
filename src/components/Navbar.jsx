@@ -25,6 +25,7 @@ const Navbar = () => {
         <Link to="/login" onClick={() => setIsMenuOpen(false)}>Log In</Link>
         <Link to="/cbtl"  onClick={() => setIsMenuOpen(false)}>Sample Cafe</Link>
         <Link to="/submit-review" onClick={() => setIsMenuOpen(false)}>Submit</Link>
+        <Link to="/cafes" onClick={() => setIsMenuOpen(false)}>Cafes</Link>
       </div>
     </nav>
   );
