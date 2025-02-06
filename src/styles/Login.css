@@ -1,10 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Glegoo:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cantata+One&family=Glegoo:wght@400;700&display=swap");
+
 .login-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/login-bg.jpg');
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("/images/login-bg.jpg");
   background-size: cover;
   background-position: center;
 }
@@ -22,7 +26,7 @@
   color: var(--primary-color);
   text-align: center;
   margin-bottom: 2rem;
-  font-family: 'Playfair Display', serif;
+  font-family: "Cantata One", serif;
 }
 
 .form-group {
@@ -34,6 +38,7 @@
   margin-bottom: 0.5rem;
   color: var(--text-color);
   font-weight: 500;
+  font-family: "Glegoo", serif;
 }
 
 .form-group input {
@@ -42,14 +47,14 @@
   margin-bottom: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font-family: 'Cantata One', serif;
+  font-family: "Cantata One", serif;
   background-color: #f5f5f5; /* Off-white background */
   color: #333; /* Dark gray text */
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #4CAF50;
+  border-color: #4caf50;
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
 }
 
@@ -64,6 +69,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  font-family: "Glegoo", serif;
 }
 
 .login-button:hover {

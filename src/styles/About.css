@@ -1,3 +1,6 @@
+@import url("https://fonts.googleapis.com/css2?family=Cantata+One&family=Glegoo:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Glegoo:wght@400;700&display=swap");
+
 .about-container {
   padding: 120px 2rem 4rem;
   max-width: 1200px;
@@ -8,7 +11,7 @@
   color: var(--primary-color);
   font-size: 2.5rem;
   margin-bottom: 2rem;
-  font-family: 'Playfair Display', serif;
+  font-family: "Cantata One", serif;
   text-align: center;
 }
 
@@ -16,6 +19,7 @@
   display: grid;
   gap: 2rem;
   grid-template-columns: 1fr;
+  font-family: "Canata One", serif;
 }
 
 @media (min-width: 768px) {
@@ -24,18 +28,20 @@
   }
 }
 
-.mission, .features {
+.mission,
+.features {
   background: white;
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.mission h2, .features h2 {
+.mission h2,
+.features h2 {
   color: var(--primary-color);
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  font-family: 'Playfair Display', serif;
+  font-family: "Glegoo", serif;
 }
 
 .mission p {

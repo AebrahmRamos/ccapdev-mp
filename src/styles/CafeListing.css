@@ -1,11 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Cantata+One&family=Glegoo:wght@400;700&display=swap");
+
 section {
-    margin-top: 10vh;
+  margin-top: 10vh;
 }
 
 h1 {
-    /* font-size: 2rem; */
-    font-weight: bold;
-    margin-bottom: 1rem;
+  /* font-size: 2rem; */
+  font-weight: bold;
+  margin-bottom: 1rem;
+  font-family: "Cantata One", serif;
 }
 
 .search-filter {
@@ -24,6 +27,8 @@ h1 {
   transition: border-color 0.3s, box-shadow 0.3s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background-color: rgba(255, 255, 255, 0.95);
+  font-family: "Cantata", serif;
+  color: #333;
 }
 
 .search-filter input:focus,
@@ -38,7 +43,8 @@ h1 {
 
 .search-filter select {
   appearance: none;
-  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDE2IDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEgMUwxNSAxbC03IDdMMCAxWiIgZmlsbD0iIzMzMyIvPjwvc3ZnPg==') no-repeat right 0.75rem center;
+  background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDE2IDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEgMUwxNSAxbC03IDdMMCAxWiIgZmlsbD0iIzMzMyIvPjwvc3ZnPg==")
+    no-repeat right 0.75rem center;
   background-size: 0.65rem;
   padding-right: 2rem;
   background-color: rgba(255, 255, 255, 0.95);
