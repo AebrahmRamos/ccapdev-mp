@@ -11,6 +11,7 @@ import cafeData from "./data/Cafes.json";
 import CafeListing from "./pages/CafeListing";
 import Footer from "./components/Footer";
 import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 import "./App.css";
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
             ))}
             <Route path="/signup" element={<Signup />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/edit-profile" element={<EditProfile />} />
           </Routes>
         </div>
         <Footer />
