@@ -12,6 +12,7 @@ import CafeListing from "./pages/CafeListing";
 import Footer from "./components/Footer";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import NewPage from "./pages/NewPage";
 import "./App.css";
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
             <Route path="/submit-review" element={<ReviewSubmission />} />
+            <Route path="/newpage" element={<NewPage />}/>
             <Route path="/cafes" element={<CafeListing />} />
             {cafeData.map((cafe) => (
               <Route

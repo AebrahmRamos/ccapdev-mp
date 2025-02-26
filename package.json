@@ -10,6 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/cantata-one": "^5.1.1",
+    "@fontsource/glegoo": "^5.1.1",
+    "@mui/material": "^6.4.5",
     "mongodb": "^6.13.1",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
