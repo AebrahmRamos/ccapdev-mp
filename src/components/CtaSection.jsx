@@ -47,6 +47,7 @@ const CtaSection = () => {
                 0.3
               )} 0%)`,
               fontFamily: "Cantata One, serif",
+              fontSize: { xs: "3rem", md: "3.7rem" },
             }}
           >
             Reimagined
