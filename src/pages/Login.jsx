@@ -1,25 +1,42 @@
-import { useState } from 'react';
-import '../styles/Login.css';
-
+import React, { useState } from "react";
+import axios from "axios";
+import "../styles/Login.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
+
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login attempt with:', formData);
+    try {
+      console.log("Sending login request with data:", formData);
+      const response = await axios.post(
+        "http://localhost:5000/api/login",
+        formData
+      );
+      if (response.status === 200) {
+        console.log("Login successful:", response.data.message);
+        window.location.href = "/";
+      } else {
+        console.log("Login failed:", response.data.message);
+        setError(response.data.message);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      setError("An error occurred. Please try again.");
+    }
   };
 
   return (
@@ -49,6 +66,7 @@ const Login = () => {
               required
             />
           </div>
+          {error && <p className="error-message">{error}</p>}
           <button type="submit" className="login-button">
             Log In
           </button>

@@ -1,13 +1,14 @@
 import { useState } from "react";
+import axios from "axios";
 import "../styles/Signup.css";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
-    role: "", 
     firstName: "",
     lastName: "",
     email: "",
     password: "",
+    role: "",
     cafeName: "",
   });
 
@@ -21,11 +22,25 @@ const Signup = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log("New User Registered:", formData);
-    alert(`Sign-up successful as ${formData.role}! You can now log in.`);
+    try {
+      console.log("Sending signup request with data:", formData);
+      const response = await axios.post(
+        "http://localhost:5000/api/signup",
+        formData
+      );
+      if (response.status === 201) {
+        console.log("Signup successful:", response.data);
+        alert(`Sign-up successful as ${formData.role}! You can now log in.`);
+      } else {
+        console.log("Signup failed:", response.data.message);
+        setErrorMessage(response.data.message);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      setErrorMessage("An error occurred. Please try again.");
+    }
   };
 
   return (
@@ -35,7 +50,13 @@ const Signup = () => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="role">Register as</label>
-            <select id="role" name="role" value={formData.role} onChange={handleChange} required>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+            >
               <option value="">Select an option</option>
               <option value="Student">Student</option>
               <option value="Cafe Owner">Cafe Owner</option>
@@ -105,7 +126,9 @@ const Signup = () => {
 
           {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-          <button type="submit" className="signup-button">Sign Up</button>
+          <button type="submit" className="signup-button">
+            Sign Up
+          </button>
         </form>
 
         <p className="login-link">
