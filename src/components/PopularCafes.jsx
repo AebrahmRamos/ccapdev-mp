@@ -10,7 +10,7 @@ import CardMedia from "@mui/material/CardMedia";
 import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
 
-import Container from "../components/Container";
+import Container from "./Container";
 
 // Temporary image locations
 import cafe1 from "../images/cafe1.jpg";
@@ -22,36 +22,37 @@ const trends = [
     image: cafe1,
     description:
       "Sed ut perspiciatis unde omnis iste natus error sit voluptatem",
-    title: "Calle Cafe",
+    title: "Starbucks",
     author: {
       name: "Clara Bertoletti",
       avatar: "https://assets.maccarianagency.com/avatars/img1.jpg",
     },
+    date: "02 Aug",
   },
   {
     image: cafe2,
     description: "At vero eos et accusamus et iusto odio dignissimos ducimus",
-    title: "Tim Hortons",
+    title: "JCO's Donuts",
     author: {
       name: "Jhon Anderson",
       avatar: "https://assets.maccarianagency.com/avatars/img2.jpg",
     },
-    date: "02 Aug",
+    date: "05 Mar",
   },
   {
     image: cafe3,
     description:
       "Qui blanditiis praesentium voluptatum deleniti atque corrupti",
-    title: "Stephanie's Cafe",
+    title: "Elsewhere Cafe",
     author: {
       name: "Chary Smith",
       avatar: "https://assets.maccarianagency.com/avatars/img3.jpg",
     },
-    date: "05 Mar",
+    date: "10 Jan",
   },
 ];
 
-const VerticallyAlignedBlogCardsWithShapedImage = () => {
+const TrendingCafes = () => {
   const theme = useTheme();
   return (
     <Container>
@@ -60,26 +61,35 @@ const VerticallyAlignedBlogCardsWithShapedImage = () => {
         justifyContent={"space-between"}
         alignItems={{ xs: "flex-start", sm: "center" }}
         flexDirection={{ xs: "column", sm: "row" }}
-        marginBottom={4}
+        marginBottom={3}
       >
-        <Box>
-          <Typography fontWeight={700} variant={"h6"} gutterBottom>
-            Trending Cafes
-          </Typography>
-          <Typography color={"text.secondary"}>
-            Here’s what we’ve been up to recently.
-          </Typography>
-        </Box>
         <Box display="flex" marginTop={{ xs: 2, md: 0 }}>
           <Box
             component={Button}
             variant="outlined"
-            color="primary"
             size="large"
-            marginLeft={2}
+            marginLeft={1}
+            sx={{
+              backgroundColor: "transparent",
+              borderColor: "#4a3b2a",
+              color: "#4a3b2a",
+              "&:hover": {
+                backgroundColor: "transparent",
+                borderColor: "#3b2e22",
+                color: "black",
+              },
+            }}
           >
             View all
           </Box>
+        </Box>
+        <Box textAlign={{ xs: "left", sm: "right" }}>
+          <Typography fontWeight={700} variant={"h6"} gutterBottom>
+            Popular Cafes
+          </Typography>
+          <Typography color={"text.secondary"}>
+            You can never go wrong with these!
+          </Typography>
         </Box>
       </Box>
       <Grid container spacing={4}>
@@ -180,4 +190,4 @@ const VerticallyAlignedBlogCardsWithShapedImage = () => {
   );
 };
 
-export default VerticallyAlignedBlogCardsWithShapedImage;
+export default TrendingCafes;

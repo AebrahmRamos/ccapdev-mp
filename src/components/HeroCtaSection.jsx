@@ -6,6 +6,8 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { alpha, useTheme } from "@mui/material/styles";
 import "@fontsource/glegoo";
 import "@fontsource/cantata-one";
+import { Link } from "react-router-dom";
+import "../styles/Hero.css";
 
 const CtaSection = () => {
   const theme = useTheme();
@@ -73,6 +75,7 @@ const CtaSection = () => {
         display="flex"
         flexDirection={{ xs: "column", sm: "row" }}
         alignItems={{ xs: "stretched", sm: "flex-start" }}
+        justifyContent="center"
       >
         <Button
           variant="contained"
@@ -86,7 +89,9 @@ const CtaSection = () => {
           size="large"
           fullWidth={isMd ? false : true}
         >
-          Sign up
+          <Link to="/signup" className="cta-button">
+            Sign up
+          </Link>
         </Button>
         <Box
           component={Button}
@@ -105,7 +110,7 @@ const CtaSection = () => {
           marginLeft={{ sm: 2 }}
           fullWidth={isMd ? false : true}
         >
-          Browse spaces
+          <Link to="/cafes">Browse spaces</Link>
         </Box>
       </Box>
     </Box>

@@ -1,10 +1,10 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
-import Container from "../components/Container";
+import Container from "./Container";
 
-import CtaSection from "../components/CtaSection";
-import CoverSlider from "../components/CoverSlider";
+import CtaSection from "./HeroCtaSection";
+import CoverSlider from "./HeroCover";
 
 const FullScreenHeroWithImageSlider = () => {
   return (
