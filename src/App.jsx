@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Signup from "./pages/Signup";
@@ -7,7 +7,6 @@ import About from "./pages/About";
 import Login from "./pages/Login";
 import CafePage from "./pages/CafePage";
 import ReviewSubmission from "./pages/ReviewSubmission";
-import cafeData from "./data/Cafes.json";
 import CafeListing from "./pages/CafeListing";
 import Footer from "./components/Footer";
 import Profile from "./pages/Profile";
@@ -15,6 +14,22 @@ import EditProfile from "./pages/EditProfile";
 import "./App.css";
 
 function App() {
+  const [cafes, setCafes] = useState([]);
+
+  useEffect(() => {
+    const fetchCafes = async () => {
+      try {
+        const response = await fetch("/api/cafes");
+        const data = await response.json();
+        setCafes(data.cafes);
+      } catch (error) {
+        console.error("Error fetching cafes:", error);
+      }
+    };
+
+    fetchCafes();
+  }, []);
+
   return (
     <Router>
       <div className="app">
@@ -25,14 +40,8 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
             <Route path="/submit-review" element={<ReviewSubmission />} />
-            <Route path="/cafes" element={<CafeListing />} />
-            {cafeData.map((cafe) => (
-              <Route
-                key={cafe.id}
-                path={`/cafe/${cafe.id}`}
-                element={<CafePage cafe={cafe} />}
-              />
-            ))}
+            <Route path="/cafe" element={<CafeListing />} />
+            <Route path="/cafe/:slug" element={<CafePage />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/edit-profile" element={<EditProfile />} />

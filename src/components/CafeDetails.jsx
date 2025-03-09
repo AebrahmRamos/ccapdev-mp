@@ -49,7 +49,7 @@ export function CafeDetails({
           </div>
           <div className={styles.imageColumn}>
             <img
-              src={`/images/cafe/${mainImage}`}
+              src={`${mainImage}`}
               alt={`${cafeName} exterior`}
               className={styles.cafeImage}
             />

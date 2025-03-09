@@ -40,8 +40,8 @@ export function ImageGallery({ images }) {
         {displayImages.map((image, index) => (
           <div key={`${currentIndex}-${index}`} className={styles.galleryItem}>
             <img
-              onClick={() => setSelectedImage(`/images/cafe/${image}`)}
-              src={`/images/cafe/${image}`}
+              onClick={() => setSelectedImage(`${image}`)}
+              src={`${image}`}
               alt={`Cafe view ${index + 1}`}
               className={styles.galleryImage}
             />

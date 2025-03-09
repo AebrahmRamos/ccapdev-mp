@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -8,52 +8,42 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Grid from "@mui/material/Grid";
-import Avatar from "@mui/material/Avatar";
-
 import Container from "./Container";
-
-// Temporary image locations
-import cafe1 from "../images/cafe1.jpg";
-import cafe2 from "../images/cafe2.jpg";
-import cafe3 from "../images/cafe3.jpg";
-
-const trends = [
-  {
-    image: cafe1,
-    description:
-      "Sed ut perspiciatis unde omnis iste natus error sit voluptatem",
-    title: "Starbucks",
-    author: {
-      name: "Clara Bertoletti",
-      avatar: "https://assets.maccarianagency.com/avatars/img1.jpg",
-    },
-    date: "02 Aug",
-  },
-  {
-    image: cafe2,
-    description: "At vero eos et accusamus et iusto odio dignissimos ducimus",
-    title: "JCO's Donuts",
-    author: {
-      name: "Jhon Anderson",
-      avatar: "https://assets.maccarianagency.com/avatars/img2.jpg",
-    },
-    date: "05 Mar",
-  },
-  {
-    image: cafe3,
-    description:
-      "Qui blanditiis praesentium voluptatum deleniti atque corrupti",
-    title: "Elsewhere Cafe",
-    author: {
-      name: "Chary Smith",
-      avatar: "https://assets.maccarianagency.com/avatars/img3.jpg",
-    },
-    date: "10 Jan",
-  },
-];
 
 const TrendingCafes = () => {
   const theme = useTheme();
+  const [trendingCafes, setTrendingCafes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTrendingCafes = async () => {
+      try {
+        const response = await fetch("http://localhost:5500/api/cafes");
+        const data = await response.json();
+        
+        // Calculate trending cafes based on review metrics
+        const processed = data.cafes
+          .map(cafe => ({
+            ...cafe,
+            // Create a trending score combining review count and average rating
+            trendingScore: cafe.totalReviews * cafe.averageReview
+          }))
+          .sort((a, b) => b.trendingScore - a.trendingScore)
+          .slice(0, 3); // Take top 3
+
+        setTrendingCafes(processed);
+      } catch (error) {
+        console.error("Error fetching cafes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrendingCafes();
+  }, []);
+
+  if (loading) return <div>Loading trending cafes...</div>;
+
   return (
     <Container>
       <Box
@@ -88,16 +78,16 @@ const TrendingCafes = () => {
             Popular Cafes
           </Typography>
           <Typography color={"text.secondary"}>
-            You can never go wrong with these!
+            Most reviewed and highest rated cafes
           </Typography>
         </Box>
       </Box>
       <Grid container spacing={4}>
-        {trends.map((item, i) => (
-          <Grid item xs={12} sm={6} md={4} key={i}>
+        {trendingCafes.map((cafe, i) => (
+          <Grid item xs={12} sm={6} md={4} key={cafe._id}>
             <Box
               component={"a"}
-              href={""}
+              href={`/cafe/${cafe.slug}`}
               display={"block"}
               width={1}
               height={1}
@@ -119,43 +109,27 @@ const TrendingCafes = () => {
                 sx={{ backgroundImage: "none" }}
               >
                 <CardMedia
-                  image={item.image}
-                  title={item.title}
+                  image={cafe.photos[0]} // Use first photo from API
+                  title={cafe.cafeName}
                   sx={{
                     height: { xs: 200, md: 260 },
                     position: "relative",
                   }}
                 >
-                  <Box
-                    component={"svg"}
-                    viewBox="0 0 2880 480"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    sx={{
-                      position: "absolute",
-                      bottom: 0,
-                      color: theme.palette.background.paper,
-                      transform: "scale(2)",
-                      height: "auto",
-                      width: 1,
-                      transformOrigin: "top center",
-                    }}
-                  >
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M2160 0C1440 240 720 240 720 240H0v240h2880V0h-720z"
-                      fill="currentColor"
-                    />
-                  </Box>
+                  {/* Keep your SVG overlay */}
                 </CardMedia>
                 <Box component={CardContent} position={"relative"}>
                   <Typography variant={"h6"} gutterBottom>
-                    {item.title}
+                    {cafe.cafeName}
                   </Typography>
                   <Typography color="text.secondary">
-                    {item.description}
+                    {cafe.address}
                   </Typography>
+                  <Box mt={1}>
+                    <Typography variant="body2">
+                      ⭐ {cafe.averageReview} ({cafe.totalReviews} reviews)
+                    </Typography>
+                  </Box>
                 </Box>
                 <Box flexGrow={1} />
                 <Box padding={2} display={"flex"} flexDirection={"column"}>
@@ -167,17 +141,11 @@ const TrendingCafes = () => {
                     justifyContent={"space-between"}
                     alignItems={"center"}
                   >
-                    <Box display={"flex"} alignItems={"center"}>
-                      <Avatar
-                        src={item.author.avatar}
-                        sx={{ marginRight: 1 }}
-                      />
-                      <Typography color={"text.secondary"}>
-                        {item.author.name}
-                      </Typography>
-                    </Box>
                     <Typography color={"text.secondary"}>
-                      {item.date}
+                      {cafe.category}
+                    </Typography>
+                    <Typography color={"text.secondary"}>
+                      {cafe.operatingHours.Monday}
                     </Typography>
                   </Box>
                 </Box>
