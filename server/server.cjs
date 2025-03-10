@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const { MongoClient, ObjectId } = require("mongodb");
 
@@ -9,13 +10,28 @@ require("dotenv").config({ path: path.join(__dirname, "config.env") });
 const app = express();
 const port = process.env.PORT || 5500;
 
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({ origin: '*' })); // Updated CORS configuration to allow all origins
 app.use(bodyParser.json());
 
 const client = new MongoClient(process.env.ATLAS_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: "Authentication required" });
+  }
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: "Invalid or expired token" });
+    }
+    req.user = user; // Add user info to request
+    next();
+  });
+};
 
 async function connectToDatabase() {
   try {
@@ -73,7 +89,20 @@ async function connectToDatabase() {
         const user = await usersCollection.findOne({ email, password });
         if (user) {
           console.log("User found:", user);
-          res.status(200).json({ message: "Login successful", user });
+          // Generate a JWT token
+          const token = jwt.sign(
+            { userId: user._id, email: user.email, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+          );
+
+          // Return both token and user data (you can omit sensitive fields like password)
+          const userData = { ...user, password: undefined };
+          res.status(200).json({ 
+            message: "Login successful", 
+            token,
+            user: userData 
+          });
         } else {
           console.log("Invalid email or password");
           res.status(401).json({ message: "Invalid email or password" });
@@ -88,7 +117,7 @@ async function connectToDatabase() {
     app.get("/api/cafes", async (req, res) => {
       try {
         const cafes = await cafesCollection.find({}).toArray();
-        console.log("Cafes fetched:", cafes);
+        // console.log("Cafes fetched:", cafes);
         res.status(200).json({ cafes });
       } catch (error) {
         console.error("Error fetching cafes", error);
@@ -210,7 +239,7 @@ async function connectToDatabase() {
       }
     });
 
-    app.get("/api/users/:email", async (req, res) => {
+    app.get("/api/users/:email", authenticateToken, async (req, res) => {
       try {
         const email = req.params.email;
         const user = await usersCollection.findOne({ email });
@@ -344,6 +373,18 @@ async function connectToDatabase() {
         res.status(500).json({ message: "Internal server error", error });
       }
     });
+
+    app.get("/api/reviews/user/:userId", async (req, res) => {
+      try {
+        const userId = req.params.userId;
+        const reviews = await reviewsCollection.find({ userId }).toArray();
+        res.status(200).json(reviews);
+      } catch (error) {
+        console.error("Error fetching user reviews", error);
+        res.status(500).json({ message: "Internal server error", error });
+      }
+    });
+
 
     // Start the server
     app.listen(port, () => {
