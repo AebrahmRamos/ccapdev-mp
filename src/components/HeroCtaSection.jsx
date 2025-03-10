@@ -110,7 +110,7 @@ const CtaSection = () => {
           marginLeft={{ sm: 2 }}
           fullWidth={isMd ? false : true}
         >
-          <Link to="/cafes">Browse spaces</Link>
+          <Link to="/cafe">Browse spaces</Link>
         </Box>
       </Box>
     </Box>

@@ -1,4 +1,3 @@
-// CafePage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "../styles/CafeDetails.module.css";
@@ -9,23 +8,32 @@ import { ReviewsSection } from "../components/ReviewsSection";
 export default function CafePage() {
   const { slug } = useParams();
   const [cafe, setCafe] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchCafe = async () => {
+    const fetchCafeAndReviews = async () => {
       try {
-        const response = await fetch(`http://localhost:5500/api/cafes/${slug}`);
-        if (!response.ok) throw new Error("Failed to fetch cafe");
-        const data = await response.json();
-        setCafe(data);
+        // First fetch cafe data
+        const cafeResponse = await fetch(`http://localhost:5500/api/cafes/${slug}`);
+        if (!cafeResponse.ok) throw new Error("Failed to fetch cafe");
+        const cafeData = await cafeResponse.json();
+        setCafe(cafeData);
+
+        // Then fetch reviews using the cafe's _id
+        const reviewsResponse = await fetch(`http://localhost:5500/api/reviews/cafe/${cafeData._id}`);
+        if (!reviewsResponse.ok) throw new Error("Failed to fetch reviews");
+        const reviewsData = await reviewsResponse.json();
+        setReviews(reviewsData);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-    fetchCafe();
+
+    fetchCafeAndReviews();
   }, [slug]);
 
   if (loading) return <div>Loading...</div>;
@@ -42,7 +50,7 @@ export default function CafePage() {
         mainImage={cafe.photos?.[0]}
       />
       <ImageGallery images={cafe.photos} />
-      <ReviewsSection reviews={cafe.userReviews} />
+      <ReviewsSection reviews={reviews} />
     </div>
   );
 }
