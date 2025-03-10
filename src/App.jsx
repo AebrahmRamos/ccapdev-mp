@@ -11,6 +11,7 @@ import CafeListing from "./pages/CafeListing";
 import Footer from "./components/Footer";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import PrivateRoute from "./components/PrivateRoute";
 import "./App.css";
 
 function App() {
@@ -39,12 +40,47 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/submit-review" element={<ReviewSubmission />} />
-            <Route path="/cafe" element={<CafeListing />} />
-            <Route path="/cafe/:slug" element={<CafePage />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/edit-profile" element={<EditProfile />} />
+            <Route
+              path="/submit-review"
+              element={
+                <PrivateRoute>
+                  <ReviewSubmission />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/cafe"
+              element={
+                <PrivateRoute>
+                  <CafeListing />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/cafe/:slug"
+              element={
+                <PrivateRoute>
+                  <CafePage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/edit-profile"
+              element={
+                <PrivateRoute>
+                  <EditProfile />
+                </PrivateRoute>
+              }
+            />
           </Routes>
         </div>
         <Footer />

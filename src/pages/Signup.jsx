@@ -27,7 +27,7 @@ const Signup = () => {
     try {
       console.log("Sending signup request with data:", formData);
       const response = await axios.post(
-        "http://localhost:5000/api/signup",
+        "http://localhost:5500/api/signup",
         formData
       );
       if (response.status === 201) {

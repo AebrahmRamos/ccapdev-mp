@@ -1,37 +1,69 @@
-import "../styles/Profile.css";
-import CafeCard from "../components/CafeCard";
-import cafes from "../data/Cafes.json";
-import { ReviewsSection } from "../components/ReviewsSection";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../utils/axiosConfig";
+import "../styles/Profile.css";
+import { ReviewsSection } from "../components/ReviewsSection";
 
 export default function Profile() {
+  const [userProfile, setUserProfile] = useState(null);
+  const [userReviews, setUserReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userDataString = localStorage.getItem("userData");
+        if (!userDataString) {
+          throw new Error("No user data found");
+        }
+
+        const userData = JSON.parse(userDataString);
+        const email = userData.email;
+        const userId = userData._id;
+
+        // Fetch user profile first
+        const profileResponse = await api.get(`/api/users/${email}`);
+        setUserProfile(profileResponse.data);
+        // console.log('User Data:', profileResponse.data); // Added console.log
+
+        // Then fetch user reviews using the fetched profile
+        const reviewsResponse = await api.get(`/api/reviews/user/${userId}`);
+        const reviewsWithUserInfo = reviewsResponse.data.map((review) => ({
+          ...review,
+          user: profileResponse.data.username,
+          profileImage: profileResponse.data.profilePicture,
+        }));
+        setUserReviews(reviewsWithUserInfo);
+        // console.log('User Reviews:', reviewsWithUserInfo); // Added console.log
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to load data");
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleEditClick = () => {
     navigate("/edit-profile");
   };
 
-  // Hardcoded user details
+  if (loading) {
+    return <p>Loading profile...</p>;
+  }
 
-  const name = "John Doe";
-  const email = "john.doe@example.com";
-  const profilePic = "https://cdn-icons-png.flaticon.com/512/147/147285.png";
-  const bio = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
-  const favoriteCafes = [1, 2, 3];
-  const userReviews = [
-    {
-      user: "John Doe",
-      rating: 5,
-      comment: "Great coffee and atmosphere!",
-      date: "Starbucks",
-    },
-    {
-      user: "John Doe",
-      rating: 4,
-      comment: "A bit pricey, but the quality is good.",
-      date: "The Coffee Bean & Tea Leaf",
-    },
-  ];
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
+  if (!userProfile) {
+    return <p>No profile data available</p>;
+  }
 
   return (
     <div className="profile">
@@ -42,24 +74,27 @@ export default function Profile() {
         />
       </div>
       <div className="profile-image">
-        <img src={profilePic} alt={`${name}'s profile`} />
+        <img
+          src={userProfile.profilePicture}
+          alt={`${userProfile.username}'s profile`}
+        />
       </div>
       <div className="profile-information">
         <div className="left">
           <div>
-            <strong>{name}</strong>
+            <strong>{userProfile.username}</strong>
           </div>
-          <div>Student</div>
-          <div>{bio}</div>
+          <div>{userProfile.role || "Student"}</div>
+          <div>bio</div>
         </div>
         <div className="right">
-          <p className="email">{email}</p>
+          <p className="email">{userProfile.email}</p>
           <button className="edit-profile-btn" onClick={handleEditClick}>
             Edit Profile
           </button>
         </div>
       </div>
-      <div className="favorite-cafes">
+      {/* <div className="favorite-cafes">
         <h1>Favorite Cafes</h1>
         <div className="cafe-grid">
           {favoriteCafes.map((cafeId) => {
@@ -75,10 +110,12 @@ export default function Profile() {
             );
           })}
         </div>
-      </div>
-      <div className="reviews" style={{ width: "100%" }}>
-        <ReviewsSection reviews={userReviews} />
-      </div>
+      </div> */}
+      {userReviews.length > 0 && (
+        <div className="reviews" style={{ width: "100%" }}>
+          <ReviewsSection reviews={userReviews} />
+        </div>
+      )}
     </div>
   );
 }

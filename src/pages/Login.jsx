@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Login.css";
 
@@ -9,6 +10,7 @@ const Login = () => {
   });
 
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,12 +25,19 @@ const Login = () => {
     try {
       console.log("Sending login request with data:", formData);
       const response = await axios.post(
-        "http://localhost:5000/api/login",
+        "http://localhost:5500/api/login",
         formData
       );
+      
+      console.log("Full response data:", response.data);
+      
       if (response.status === 200) {
         console.log("Login successful:", response.data.message);
-        window.location.href = "/";
+        // Store the token
+        localStorage.setItem("authToken", response.data.token);
+        // Optionally store user data
+        localStorage.setItem("userData", JSON.stringify(response.data.user));
+        navigate("/");
       } else {
         console.log("Login failed:", response.data.message);
         setError(response.data.message);
