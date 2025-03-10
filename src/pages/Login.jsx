@@ -23,7 +23,7 @@ const Login = () => {
     try {
       console.log("Sending login request with data:", formData);
       const response = await axios.post(
-        "http://localhost:5000/api/login",
+        "http://localhost:5500/api/login",
         formData
       );
       if (response.status === 200) {

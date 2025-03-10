@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { MongoClient, ObjectId } = require("mongodb");
-const generateSlug = require("../src/utils/slugGenerator").default;
+
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "config.env") });
 
@@ -26,11 +26,16 @@ async function connectToDatabase() {
     const usersCollection = db.collection("users");
     const cafesCollection = db.collection("cafes");
     const reviewsCollection = db.collection("reviews");
+    const { default: generateSlug } = await import(
+      "../src/utils/slugGenerator.js"
+    );
 
     // Test the connection by listing the databases
     const databasesList = await client.db().admin().listDatabases();
     console.log("Databases:");
-    databasesList.databases.forEach((dbInfo) => console.log(` - ${dbInfo.name}`));
+    databasesList.databases.forEach((dbInfo) =>
+      console.log(` - ${dbInfo.name}`)
+    );
 
     // Signup route
     app.post("/api/signup", async (req, res) => {
@@ -42,7 +47,14 @@ async function connectToDatabase() {
           console.log("User already exists:", existingUser);
           res.status(400).json({ message: "User already exists" });
         } else {
-          const newUser = { role, firstName, lastName, email, password, cafeName };
+          const newUser = {
+            role,
+            firstName,
+            lastName,
+            email,
+            password,
+            cafeName,
+          };
           await usersCollection.insertOne(newUser);
           console.log("New user registered:", newUser);
           res.status(201).json({ message: "Signup successful", user: newUser });
@@ -105,7 +117,8 @@ async function connectToDatabase() {
 
     app.post("/api/cafes", async (req, res) => {
       try {
-        const { cafeName, address, operatingHours, photos, userReviews } = req.body;
+        const { cafeName, address, operatingHours, photos, userReviews } =
+          req.body;
 
         // Generate a slug from the cafe name
         const slug = generateSlug(cafeName);
@@ -142,37 +155,37 @@ async function connectToDatabase() {
 
     app.put("/api/cafes/:slug", async (req, res) => {
       try {
-      const slug = req.params.slug;
-      const updatedData = req.body;
-      // Generate new slug if cafe name is being updated
-      if (updatedData.cafeName) {
-        updatedData.slug = generateSlug(updatedData.cafeName);
-      }
-      const result = await cafesCollection.updateOne(
-        { slug },
-        { $set: updatedData }
-      );
-      if (result.matchedCount === 0) {
-        return res.status(404).json({ message: "Cafe not found" });
-      }
-      res.status(200).json({ message: "Cafe updated successfully" });
+        const slug = req.params.slug;
+        const updatedData = req.body;
+        // Generate new slug if cafe name is being updated
+        if (updatedData.cafeName) {
+          updatedData.slug = generateSlug(updatedData.cafeName);
+        }
+        const result = await cafesCollection.updateOne(
+          { slug },
+          { $set: updatedData }
+        );
+        if (result.matchedCount === 0) {
+          return res.status(404).json({ message: "Cafe not found" });
+        }
+        res.status(200).json({ message: "Cafe updated successfully" });
       } catch (error) {
-      console.error("Error updating cafe", error);
-      res.status(500).json({ message: "Internal server error", error });
+        console.error("Error updating cafe", error);
+        res.status(500).json({ message: "Internal server error", error });
       }
     });
 
     app.delete("/api/cafes/:slug", async (req, res) => {
       try {
-      const slug = req.params.slug;
-      const result = await cafesCollection.deleteOne({ slug });
-      if (result.deletedCount === 0) {
-        return res.status(404).json({ message: "Cafe not found" });
-      }
-      res.status(200).json({ message: "Cafe deleted successfully" });
+        const slug = req.params.slug;
+        const result = await cafesCollection.deleteOne({ slug });
+        if (result.deletedCount === 0) {
+          return res.status(404).json({ message: "Cafe not found" });
+        }
+        res.status(200).json({ message: "Cafe deleted successfully" });
       } catch (error) {
-      console.error("Error deleting cafe", error);
-      res.status(500).json({ message: "Internal server error", error });
+        console.error("Error deleting cafe", error);
+        res.status(500).json({ message: "Internal server error", error });
       }
     });
 
@@ -180,7 +193,9 @@ async function connectToDatabase() {
     app.post("/api/users", async (req, res) => {
       try {
         const newUser = req.body;
-        const existingUser = await usersCollection.findOne({ email: newUser.email });
+        const existingUser = await usersCollection.findOne({
+          email: newUser.email,
+        });
         if (existingUser) {
           return res.status(400).json({ message: "User already exists" });
         }
@@ -266,12 +281,15 @@ async function connectToDatabase() {
         }
 
         cafe.totalReviews += 1;
-        cafe.averageReview = (
-          (cafe.averageReview * (cafe.totalReviews - 1) + rating.overall) / cafe.totalReviews);
+        cafe.averageReview =
+          (cafe.averageReview * (cafe.totalReviews - 1) + rating.overall) /
+          cafe.totalReviews;
 
         await cafe.save();
 
-        res.status(201).json({ message: "Review created successfully", review: newReview });
+        res
+          .status(201)
+          .json({ message: "Review created successfully", review: newReview });
       } catch (error) {
         res.status(500).json({ message: "Internal server error", error });
       }

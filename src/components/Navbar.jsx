@@ -19,14 +19,25 @@ const Navbar = () => {
       <button className="menu-button" onClick={toggleMenu}>
         ☰
       </button>
-      <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-        <Link to="/" onClick={() => setIsMenuOpen(false)}>Home</Link>
-        <Link to="/about" onClick={() => setIsMenuOpen(false)}>About</Link>
-        <Link to="/login" onClick={() => setIsMenuOpen(false)}>Log In</Link>
-        <Link to="/submit-review" onClick={() => setIsMenuOpen(false)}>Submit</Link>
-        <Link to="/cafes" onClick={() => setIsMenuOpen(false)}>Cafes</Link>
-        <Link to="/profile" onClick={() => setIsMenuOpen(false)}>Profile</Link>
-        <Link to="/cafe-owner" onClick={() => setIsMenuOpen(false)}>Cafe Owner</Link>
+      <div className={`nav-links ${isMenuOpen ? "active" : ""}`}>
+        <Link to="/" onClick={() => setIsMenuOpen(false)}>
+          Home
+        </Link>
+        <Link to="/about" onClick={() => setIsMenuOpen(false)}>
+          About
+        </Link>
+        <Link to="/submit-review" onClick={() => setIsMenuOpen(false)}>
+          Submit
+        </Link>
+        <Link to="/cafes" onClick={() => setIsMenuOpen(false)}>
+          Cafes
+        </Link>
+        <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+          Profile
+        </Link>
+        <Link to="/cafe-owner" onClick={() => setIsMenuOpen(false)}>
+          Cafe Owner
+        </Link>
       </div>
     </nav>
   );

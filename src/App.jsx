@@ -20,7 +20,7 @@ function App() {
   useEffect(() => {
     const fetchCafes = async () => {
       try {
-        const response = await fetch("/api/cafes");
+        const response = await fetch("http://localhost:5500/api/cafes");
         const data = await response.json();
         setCafes(data.cafes);
       } catch (error) {
@@ -41,7 +41,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
             <Route path="/submit-review" element={<ReviewSubmission />} />
-            <Route path="/cafe" element={<CafeListing />} />
+            <Route path="/cafes" element={<CafeListing />} />
             <Route path="/cafe/:slug" element={<CafePage />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/profile" element={<Profile />} />
