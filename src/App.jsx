@@ -12,6 +12,7 @@ import Footer from "./components/Footer";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import PrivateRoute from "./components/PrivateRoute";
+import CafeOwnerProfile from "./pages/CafeOwnerProfile";
 import "./App.css";
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
   useEffect(() => {
     const fetchCafes = async () => {
       try {
-        const response = await fetch("/api/cafes");
+        const response = await fetch("http://localhost:5500/api/cafes");
         const data = await response.json();
         setCafes(data.cafes);
       } catch (error) {
@@ -78,6 +79,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <EditProfile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/cafe-owner"
+              element={
+                <PrivateRoute>
+                  <CafeOwnerProfile />
                 </PrivateRoute>
               }
             />

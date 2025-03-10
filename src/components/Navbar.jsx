@@ -29,8 +29,14 @@ const Navbar = () => {
         <Link to="/submit-review" onClick={() => setIsMenuOpen(false)}>
           Submit
         </Link>
+        <Link to="/cafes" onClick={() => setIsMenuOpen(false)}>
+          Cafes
+        </Link>
         <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
           Profile
+        </Link>
+        <Link to="/cafe-owner" onClick={() => setIsMenuOpen(false)}>
+          Cafe Owner
         </Link>
       </div>
     </nav>
