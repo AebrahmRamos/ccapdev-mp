@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
+import CardMedia from "@mui/material/CardMedia";m 
 import Grid from "@mui/material/Grid";
 import Container from "./Container";
 
@@ -20,13 +20,13 @@ const TrendingCafes = () => {
       try {
         const response = await fetch("http://localhost:5500/api/cafes");
         const data = await response.json();
-        
+
         // Calculate trending cafes based on review metrics
         const processed = data.cafes
-          .map(cafe => ({
+          .map((cafe) => ({
             ...cafe,
             // Create a trending score combining review count and average rating
-            trendingScore: cafe.totalReviews * cafe.averageReview
+            trendingScore: cafe.totalReviews * cafe.averageReview,
           }))
           .sort((a, b) => b.trendingScore - a.trendingScore)
           .slice(0, 3); // Take top 3
@@ -122,9 +122,7 @@ const TrendingCafes = () => {
                   <Typography variant={"h6"} gutterBottom>
                     {cafe.cafeName}
                   </Typography>
-                  <Typography color="text.secondary">
-                    {cafe.address}
-                  </Typography>
+                  <Typography color="text.secondary">{cafe.address}</Typography>
                   <Box mt={1}>
                     <Typography variant="body2">
                       ⭐ {cafe.averageReview} ({cafe.totalReviews} reviews)
