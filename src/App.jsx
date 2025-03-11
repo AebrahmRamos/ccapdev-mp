@@ -67,18 +67,24 @@ function App() {
               }
             />
             <Route
-              path="/profile"
-              element={
-                <PrivateRoute>
-                  <Profile />
-                </PrivateRoute>
-              }
-            />
-            <Route
               path="/edit-profile"
               element={
                 <PrivateRoute>
                   <EditProfile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  {
+                    localStorage.getItem('userData') ? 
+                    (JSON.parse(localStorage.getItem('userData')).role === 'Student' ?
+                    <Profile /> :
+                    <CafeOwnerProfile />) :
+                    <Login />
+                  }
                 </PrivateRoute>
               }
             />

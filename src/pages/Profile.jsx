@@ -82,10 +82,10 @@ export default function Profile() {
       <div className="profile-information">
         <div className="left">
           <div>
-            <strong>{userProfile.username}</strong>
+            <strong>{userProfile.firstName} {userProfile.lastName}</strong>
           </div>
           <div>{userProfile.role || "Student"}</div>
-          <div>bio</div>
+          <div>{userProfile.bio}</div>
         </div>
         <div className="right">
           <p className="email">{userProfile.email}</p>

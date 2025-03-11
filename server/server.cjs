@@ -58,7 +58,16 @@ async function connectToDatabase() {
           console.log("User already exists:", existingUser);
           res.status(400).json({ message: "User already exists" });
         } else {
-          const newUser = { role, firstName, lastName, email, password, cafeName };
+          const newUser = { 
+            role,
+            firstName,
+            lastName,
+            email,
+            password,
+            bio: "Enter your bio here",
+            cafeName,
+            profilePicture: "https://cdn-icons-png.flaticon.com/512/147/147285.png", // Default profile picture
+          };
           await usersCollection.insertOne(newUser);
           console.log("New user registered:", newUser);
           res.status(201).json({ message: "Signup successful", user: newUser });
@@ -224,17 +233,20 @@ async function connectToDatabase() {
       }
     });
 
-    app.get("/api/users/:email", authenticateToken, async (req, res) => {
+    app.get("/api/users/:id", authenticateToken, async (req, res) => {
       try {
-        const email = req.params.email;
-        const user = await usersCollection.findOne({ email });
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json(user);
+      const id = req.params.id;
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid user ID format" });
+      }
+      const user = await usersCollection.findOne({ _id: new ObjectId(id) });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(200).json(user);
       } catch (error) {
-        console.error("Error fetching user", error);
-        res.status(500).json({ message: "Internal server error", error });
+      console.error("Error fetching user", error);
+      res.status(500).json({ message: "Internal server error", error });
       }
     });
 
