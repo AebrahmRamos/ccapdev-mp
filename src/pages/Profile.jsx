@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/axiosConfig";
 import "../styles/Profile.css";
@@ -20,7 +20,6 @@ export default function Profile() {
         }
 
         const userData = JSON.parse(userDataString);
-        const email = userData.email;
         const userId = userData._id;
 
         // Fetch user profile first

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import styles from "../styles/CafeDetails.module.css";
 import api from "../utils/axiosConfig";
 
 function ReviewCard({
-  user,
   date,
   userId, // Add userId to fetch the user's profile image
   textReview,
@@ -98,3 +98,37 @@ function ReviewsSection({ reviews }) {
 }
 
 export default ReviewsSection;
+
+ReviewCard.propTypes = {
+  date: PropTypes.string.isRequired,
+  userId: PropTypes.string.isRequired,
+  textReview: PropTypes.string.isRequired,
+  rating: PropTypes.shape({
+    ambiance: PropTypes.number.isRequired,
+    drinkQuality: PropTypes.number.isRequired,
+    service: PropTypes.number.isRequired,
+    wifiReliability: PropTypes.number.isRequired,
+    cleanliness: PropTypes.number.isRequired,
+    valueForMoney: PropTypes.number.isRequired,
+  }).isRequired,
+  photos: PropTypes.arrayOf(PropTypes.string),
+  videos: PropTypes.arrayOf(PropTypes.string),
+};
+
+ReviewsSection.propTypes = {
+  reviews: PropTypes.arrayOf(PropTypes.shape({
+    date: PropTypes.string.isRequired,
+    userId: PropTypes.string.isRequired,
+    textReview: PropTypes.string.isRequired,
+    rating: PropTypes.shape({
+      ambiance: PropTypes.number.isRequired,
+      drinkQuality: PropTypes.number.isRequired,
+      service: PropTypes.number.isRequired,
+      wifiReliability: PropTypes.number.isRequired,
+      cleanliness: PropTypes.number.isRequired,
+      valueForMoney: PropTypes.number.isRequired,
+    }).isRequired,
+    photos: PropTypes.arrayOf(PropTypes.string),
+    videos: PropTypes.arrayOf(PropTypes.string),
+  })).isRequired,
+};

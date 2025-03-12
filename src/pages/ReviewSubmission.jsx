@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import '../styles/ReviewSubmission.css';
 import { FaStar } from 'react-icons/fa';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { set } from 'lodash';
 
 const ReviewSubmission = () => {
   const navigate = useNavigate();
@@ -35,8 +34,7 @@ const ReviewSubmission = () => {
   useEffect(() => {
     const fetchCafes = async () => {
       try {
-        const response = await fetch("http://localhost:5500/api/cafes");
-        const data = await response.json();
+        const { data } = await fetch("http://localhost:5500/api/cafes").then(response => response.json());
         setCafes(data.cafes);
       } catch (err) {
         console.error('Error fetching cafes:', err);
@@ -119,6 +117,7 @@ const ReviewSubmission = () => {
 
       // Submit review
       const response = await axios.post('http://localhost:5500/api/reviews', reviewData);
+      console.log('Review submission response:', response.data);
 
       setIsLoading(false);
 

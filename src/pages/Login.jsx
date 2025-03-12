@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Login.css";
@@ -81,7 +81,7 @@ const Login = () => {
           </button>
         </form>
         <p className="signup-link">
-          Don't have an account? <a href="/signup">Sign up</a>
+          Don&apos;t have an account? <a href="/signup">Sign up</a>
         </p>
       </div>
     </div>

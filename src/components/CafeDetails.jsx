@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from "prop-types";
 import styles from "../styles/CafeDetails.module.css";
 
 export function CafeDetails({
@@ -60,4 +60,11 @@ export function CafeDetails({
   );
 }
 
-CafeDetails.propT
+CafeDetails.propTypes = {
+  cafeName: PropTypes.string.isRequired,
+  totalReviews: PropTypes.number.isRequired,
+  averageReview: PropTypes.number.isRequired,
+  address: PropTypes.string.isRequired,
+  operatingHours: PropTypes.object.isRequired,
+  mainImage: PropTypes.string.isRequired
+};

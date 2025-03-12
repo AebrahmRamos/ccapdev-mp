@@ -1,6 +1,7 @@
 // migrateSlugs.js
 import { MongoClient } from "mongodb";
 import dotenv from 'dotenv';
+import process from 'node:process';
 dotenv.config();
 
 // Function to generate a URL-friendly slug

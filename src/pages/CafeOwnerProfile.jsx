@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "../styles/Profile.css";
 import "../styles/CafeOwnerProfile.css";
 import { useNavigate } from "react-router-dom";

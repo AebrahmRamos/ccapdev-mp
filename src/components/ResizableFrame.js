@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -44,7 +44,7 @@ const ResizableFrame = ({ src, title, path, iframeStyles = {}, ...rest }) => {
   }, [viewportWidth]);
 
   useEffect(() => {
-    setRandom(random + 1);
+    setRandom(r => r + 1);
   }, [theme.palette.mode]);
 
   const handleResizeBtnClick = (width) => {

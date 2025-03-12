@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -83,7 +83,7 @@ const TrendingCafes = () => {
         </Box>
       </Box>
       <Grid container spacing={4}>
-        {trendingCafes.map((cafe, i) => (
+        {trendingCafes.map((cafe) => (
           <Grid item xs={12} sm={6} md={4} key={cafe._id}>
             <Box
               component={"a"}

@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from "prop-types";
 import styles from "../styles/CafeDetails.module.css";
 import { ReviewCard } from "./ReviewCard";
 
@@ -14,3 +14,7 @@ export function ReviewsSection({ reviews }) {
     </div>
   );
 }
+
+ReviewsSection.propTypes = {
+  reviews: PropTypes.arrayOf(PropTypes.shape(ReviewCard.propTypes)).isRequired,
+};

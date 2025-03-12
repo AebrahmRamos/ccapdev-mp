@@ -1,18 +1,14 @@
-import React, {useState, useEffect} from "react";
+import PropTypes from "prop-types";
 import styles from "../styles/CafeDetails.module.css";
-import api from "../utils/axiosConfig";
 
 export function ReviewCard({
-  user,
   date,
-  profileImage: initialProfileImage,
+  profileImage,
   textReview,
   rating,
   photos,
   videos,
 }) {
-  const [profileImage, setProfileImage] = useState(initialProfileImage);
-  const [name, setName] = useState(user);
 
 
   return (
@@ -85,3 +81,12 @@ export function ReviewCard({
     </div>
   );
 }
+
+ReviewCard.propTypes = {
+  date: PropTypes.string.isRequired,
+  profileImage: PropTypes.string.isRequired,
+  textReview: PropTypes.string.isRequired,
+  rating: PropTypes.object.isRequired,
+  photos: PropTypes.array.isRequired,
+  videos: PropTypes.array.isRequired,
+};
