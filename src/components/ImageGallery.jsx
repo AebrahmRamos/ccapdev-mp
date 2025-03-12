@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import PropTypes from "prop-types";
 import styles from "../styles/CafeDetails.module.css";
 
 export function ImageGallery({ images }) {
@@ -40,8 +41,8 @@ export function ImageGallery({ images }) {
         {displayImages.map((image, index) => (
           <div key={`${currentIndex}-${index}`} className={styles.galleryItem}>
             <img
-              onClick={() => setSelectedImage(`/images/cafe/${image}`)}
-              src={`/images/cafe/${image}`}
+              onClick={() => setSelectedImage(`${image}`)}
+              src={`${image}`}
               alt={`Cafe view ${index + 1}`}
               className={styles.galleryImage}
             />
@@ -70,3 +71,7 @@ export function ImageGallery({ images }) {
     </div>
   );
 }
+
+ImageGallery.propTypes = {
+  images: PropTypes.arrayOf(PropTypes.string).isRequired,
+};

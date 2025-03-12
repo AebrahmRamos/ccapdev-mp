@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 import '../styles/RadioReviews.css';
 
 const RadioReviews = ({ cafeDetails, onChange }) => {
@@ -155,3 +155,8 @@ const RadioReviews = ({ cafeDetails, onChange }) => {
 };
 
 export default RadioReviews;
+
+RadioReviews.propTypes = {
+  cafeDetails: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
