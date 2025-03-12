@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Signup from "./pages/Signup";
@@ -16,21 +15,6 @@ import CafeOwnerProfile from "./pages/CafeOwnerProfile";
 import "./App.css";
 
 function App() {
-  const [cafes, setCafes] = useState([]);
-
-  useEffect(() => {
-    const fetchCafes = async () => {
-      try {
-        const response = await fetch("http://localhost:5500/api/cafes");
-        const data = await response.json();
-        setCafes(data.cafes);
-      } catch (error) {
-        console.error("Error fetching cafes:", error);
-      }
-    };
-
-    fetchCafes();
-  }, []);
 
   return (
     <Router>

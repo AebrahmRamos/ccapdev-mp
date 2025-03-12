@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import styles from "../styles/CafeDetails.module.css";
 import { CafeDetails } from "../components/CafeDetails";
 import { ImageGallery } from "../components/ImageGallery";
-import { ReviewsSection } from "../components/ReviewsSection";
+import CafeReviewSection from "../components/CafeReviewSection";
 
 export default function CafePage() {
   const { slug } = useParams();
@@ -50,7 +50,7 @@ export default function CafePage() {
         mainImage={cafe.photos?.[0]}
       />
       <ImageGallery images={cafe.photos} />
-      <ReviewsSection reviews={reviews} />
+      <CafeReviewSection reviews={reviews} /> {/* Pass reviews to ReviewsSection */}
     </div>
   );
 }

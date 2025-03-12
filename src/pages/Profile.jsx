@@ -24,7 +24,7 @@ export default function Profile() {
         const userId = userData._id;
 
         // Fetch user profile first
-        const profileResponse = await api.get(`/api/users/${email}`);
+        const profileResponse = await api.get(`/api/users/${userId}`);
         setUserProfile(profileResponse.data);
         // console.log('User Data:', profileResponse.data); // Added console.log
 
@@ -36,7 +36,7 @@ export default function Profile() {
           profileImage: profileResponse.data.profilePicture,
         }));
         setUserReviews(reviewsWithUserInfo);
-        // console.log('User Reviews:', reviewsWithUserInfo); // Added console.log
+        console.log('User Reviews:', reviewsWithUserInfo); // Added console.log
 
         setLoading(false);
       } catch (err) {

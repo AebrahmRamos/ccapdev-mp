@@ -1,28 +1,31 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import styles from "../styles/CafeDetails.module.css";
+import api from "../utils/axiosConfig";
 
 export function ReviewCard({
   user,
   date,
-  profileImage,
+  profileImage: initialProfileImage,
   textReview,
   rating,
   photos,
   videos,
 }) {
+  const [profileImage, setProfileImage] = useState(initialProfileImage);
+  const [name, setName] = useState(user);
+
 
   return (
     <div className={styles.reviewCard}>
       <div className={styles.reviewHeader}>
         <img
           src={profileImage}
-          alt={`${user}'s profile`}
           className={styles.reviewerImage}
         />
         <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
           <div className={styles.reviewerInfo}>
             <div className={styles.reviewerMeta}>
-              <span>{user}</span>
+              <span></span>
               <span>{new Date(date).toLocaleDateString()}</span>
             </div>
             {/* <div className={styles.ratingDisplay}>
