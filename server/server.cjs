@@ -8,6 +8,7 @@ require("dotenv").config({ path: path.join(__dirname, "config.env") });
 const mongoose = require("mongoose");
 const Review = require("./Models/Review.cjs");
 const Cafe = require("./Models/Cafe.cjs");
+const User = require("./Models/Users.cjs");
 
 const app = express();
 const port = process.env.PORT || 5500;
@@ -162,8 +163,16 @@ async function connectToDatabase() {
       const { userId, profilePic, firstName, lastName, email, bio } = req.body;
 
       try {
+        console.log("Updating profile for user ID:", userId); // Add logging
+
+        // Verify if userId is a valid ObjectId
+        if (!ObjectId.isValid(userId)) {
+          console.log("Invalid user ID format:", userId); // Add logging
+          return res.status(400).json({ message: "Invalid user ID format" });
+        }
+
         const updatedUser = await User.findByIdAndUpdate(
-          userId,
+          ObjectId(userId), // Use ObjectId(userId)
           {
             profilePicture: profilePic,
             firstName,
@@ -175,14 +184,16 @@ async function connectToDatabase() {
         );
 
         if (!updatedUser) {
+          console.log("User not found:", userId); // Add logging
           return res.status(404).json({ message: "User not found" });
         }
 
+        console.log("Profile updated successfully for user ID:", userId); // Add logging
         res
           .status(200)
           .json({ message: "Profile updated successfully", user: updatedUser });
       } catch (error) {
-        console.error("Error updating profile", error);
+        console.error("Error updating profile:", error);
         res.status(500).json({ message: "Internal server error", error });
       }
     });
