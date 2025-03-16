@@ -1,42 +1,64 @@
 import "../styles/Profile.css";
 import "../styles/CafeOwnerProfile.css";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export default function CafeOwnerProfile() {
   const navigate = useNavigate();
-
-  // Hardcoded owner details
-  const ownerData = {
-    name: "John Smith",
-    role: "Cafe Owner",
-    email: "john.smith@elsewhere.cafe",
-    bio: "Proud owner of Elsewhere Cafe, serving the best coffee in Manila since 2020.",
+  const [ownerData, setOwnerData] = useState({
+    name: "",
+    role: "",
+    email: "",
+    bio: "",
     profilePic: "https://cdn-icons-png.flaticon.com/512/147/147285.png",
     coverImage:
       "https://t3.ftcdn.net/jpg/01/94/82/86/360_F_194828624_llDpKzFNYmi6cfHVF8GOOoAe5KTJlc9N.jpg",
-  };
+  });
+  const [cafeData, setCafeData] = useState({
+    name: "",
+    address: "",
+    rating: 0,
+    logo: "",
+    openingHours: {},
+    photos: [],
+  });
 
-  // Hardcoded cafe details
-  const cafeData = {
-    name: "Elsewhere Cafe",
-    address: "3/F, 2510 Taft Ave, Malate, Manila, 1004 Metro Manila",
-    rating: 4.5,
-    logo: "/images/aeb.jpg",
-    openingHours: {
-      Monday: "12-9PM",
-      Tuesday: "12-9PM",
-      Wednesday: "12-9PM",
-      Thursday: "12-9PM",
-      Friday: "12-9PM",
-      Saturday: "12-9PM",
-      Sunday: "Closed",
-    },
-    photos: [
-      "/images/cafe/cafe1.jpg",
-      "/images/cafe/cafe2.jpg",
-      "/images/cafe/cafe3.jpg",
-      "/images/cafe/cafe4.jpg",
-    ],
+  useEffect(() => {
+    // Retrieve user data from local storage
+    const userData = localStorage.getItem("userData");
+    if (userData) {
+      const user = JSON.parse(userData);
+      setOwnerData({
+        name: `${user.firstName} ${user.lastName}`,
+        role: user.role,
+        email: user.email,
+        bio: user.bio,
+        profilePic:
+          user.profilePicture ||
+          "https://cdn-icons-png.flaticon.com/512/147/147285.png",
+        coverImage:
+          user.coverImage ||
+          "https://t3.ftcdn.net/jpg/01/94/82/86/360_F_194828624_llDpKzFNYmi6cfHVF8GOOoAe5KTJlc9N.jpg",
+      });
+
+      // Assuming cafe data is also stored in user data
+      setCafeData({
+        name: user.cafeName || "My Cafe",
+        address: user.cafeAddress || "Cafe Address",
+        rating: user.cafeRating || 0,
+        logo: user.cafeLogo || "/images/default-cafe-logo.png",
+        openingHours: user.cafeOpeningHours || {},
+        photos: user.cafePhotos || [],
+      });
+    }
+  }, []);
+
+  const handleLogoutClick = () => {
+    // Clear user data from local storage
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userData");
+    // Redirect to login page
+    navigate("/login");
   };
 
   const handleEditProfile = () => {
@@ -69,6 +91,9 @@ export default function CafeOwnerProfile() {
           <button className="edit-profile-btn" onClick={handleEditProfile}>
             Edit Profile
           </button>
+          <button className="logout-btn" onClick={handleLogoutClick}>
+            Logout
+          </button>
         </div>
       </div>
 
@@ -79,8 +104,8 @@ export default function CafeOwnerProfile() {
             <div className="cafe-info">
               <h1>{cafeData.name}</h1>
               <div className="rating">
-                {"★".repeat(4)}
-                {"☆"}
+                {"★".repeat(Math.floor(cafeData.rating))}
+                {"☆".repeat(5 - Math.floor(cafeData.rating))}
                 <span className="rating-text">({cafeData.rating})</span>
               </div>
               <p className="address">{cafeData.address}</p>

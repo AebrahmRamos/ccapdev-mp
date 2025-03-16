@@ -69,33 +69,52 @@ async function connectToDatabase() {
       console.log(` - ${dbInfo.name}`)
     );
 
-    // Signup route
+    // Signup endpoint
     app.post("/api/signup", async (req, res) => {
-      const { role, firstName, lastName, email, password, cafeName } = req.body;
-      console.log(`Signup attempt with email: ${email}`);
+      const { firstName, lastName, email, password, role, cafeName } = req.body;
+
       try {
-        const existingUser = await usersCollection.findOne({ email });
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
         if (existingUser) {
-          console.log("User already exists:", existingUser);
-          res.status(400).json({ message: "User already exists" });
-        } else {
-          const newUser = {
-            role,
-            firstName,
-            lastName,
-            email,
-            password,
-            bio: "Enter your bio here",
-            cafeName,
-            profilePicture:
-              "https://cdn-icons-png.flaticon.com/512/147/147285.png", // Default profile picture
-          };
-          await usersCollection.insertOne(newUser);
-          console.log("New user registered:", newUser);
-          res.status(201).json({ message: "Signup successful", user: newUser });
+          return res.status(400).json({ message: "User already exists" });
         }
+
+        // Create new user
+        const newUser = new User({
+          firstName,
+          lastName,
+          email,
+          password,
+          role,
+        });
+
+        await newUser.save();
+
+        // If the user is a cafe owner, create a new cafe
+        if (role === "Cafe Owner") {
+          const newCafe = new Cafe({
+            cafeName,
+            ownerEmail: email,
+            address: "",
+            operatingHours: {
+              Monday: "",
+              Tuesday: "",
+              Wednesday: "",
+              Thursday: "",
+              Friday: "",
+              Saturday: "",
+              Sunday: "",
+            },
+            photos: [],
+          });
+
+          await newCafe.save();
+        }
+
+        res.status(201).json({ message: "Signup successful", user: newUser });
       } catch (error) {
-        console.error("Error during signup", error);
+        console.error("Error during signup:", error);
         res.status(500).json({ message: "Internal server error", error });
       }
     });
@@ -756,6 +775,55 @@ async function connectToDatabase() {
         res
           .status(500)
           .json({ message: "Internal server error", error: error.message });
+      }
+    });
+
+    // Endpoint to fetch cafe data based on user email
+    app.get("/api/cafe", async (req, res) => {
+      const { email } = req.query;
+
+      try {
+        const user = await User.findOne({ email });
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        const cafe = await Cafe.findOne({ ownerEmail: email });
+        if (!cafe) {
+          return res.status(404).json({ message: "Cafe not found" });
+        }
+
+        res.status(200).json({ user, cafe });
+      } catch (error) {
+        console.error("Error fetching cafe data:", error);
+        res.status(500).json({ message: "Internal server error", error });
+      }
+    });
+
+    // Endpoint to update cafe data
+    app.put("/api/cafe", async (req, res) => {
+      const { email, cafeName, address, operatingHours, photos } = req.body;
+
+      try {
+        const cafe = await Cafe.findOneAndUpdate(
+          { ownerEmail: email },
+          {
+            cafeName,
+            address,
+            operatingHours,
+            photos,
+          },
+          { new: true }
+        );
+
+        if (!cafe) {
+          return res.status(404).json({ message: "Cafe not found" });
+        }
+
+        res.status(200).json({ message: "Cafe updated successfully", cafe });
+      } catch (error) {
+        console.error("Error updating cafe:", error);
+        res.status(500).json({ message: "Internal server error", error });
       }
     });
 

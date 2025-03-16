@@ -10,6 +10,7 @@ import CafeListing from "./pages/CafeListing";
 import Footer from "./components/Footer";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import EditCafe from "./pages/EditCafe";
 import PrivateRoute from "./components/PrivateRoute";
 import CafeOwnerProfile from "./pages/CafeOwnerProfile";
 import "./App.css";
@@ -54,6 +55,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <EditProfile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/edit-cafe"
+              element={
+                <PrivateRoute>
+                  <EditCafe />
                 </PrivateRoute>
               }
             />
