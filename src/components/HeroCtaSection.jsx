@@ -7,12 +7,22 @@ import "@fontsource/glegoo";
 import "@fontsource/cantata-one";
 import { Link } from "react-router-dom";
 import "../styles/Hero.css";
+import { useEffect, useState } from "react";
 
 const CtaSection = () => {
   const theme = useTheme();
   const isMd = useMediaQuery(theme.breakpoints.up("md"), {
     defaultMatches: true,
   });
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const userData = localStorage.getItem("userData");
+    if (userData) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   return (
     <Box>
@@ -76,22 +86,24 @@ const CtaSection = () => {
         alignItems={{ xs: "stretched", sm: "flex-start" }}
         justifyContent="center"
       >
-        <Button
-          variant="contained"
-          sx={{
-            backgroundColor: "#4a3b2a",
-            "&:hover": {
-              backgroundColor: "#3b2e22",
-            },
-            fontFamily: "Glegoo, serif",
-          }}
-          size="large"
-          fullWidth={isMd ? false : true}
-        >
-          <Link to="/signup" className="cta-button">
-            Sign up
-          </Link>
-        </Button>
+        {!isLoggedIn && (
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "#4a3b2a",
+              "&:hover": {
+                backgroundColor: "#3b2e22",
+              },
+              fontFamily: "Glegoo, serif",
+            }}
+            size="large"
+            fullWidth={isMd ? false : true}
+          >
+            <Link to="/signup" className="cta-button">
+              Sign up
+            </Link>
+          </Button>
+        )}
         <Box
           component={Button}
           variant="outlined"

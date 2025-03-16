@@ -35,7 +35,7 @@ export default function Profile() {
           profileImage: profileResponse.data.profilePicture,
         }));
         setUserReviews(reviewsWithUserInfo);
-        console.log('User Reviews:', reviewsWithUserInfo); // Added console.log
+        console.log("User Reviews:", reviewsWithUserInfo); // Added console.log
 
         setLoading(false);
       } catch (err) {
@@ -50,6 +50,14 @@ export default function Profile() {
 
   const handleEditClick = () => {
     navigate("/edit-profile");
+  };
+
+  const handleLogoutClick = () => {
+    // Clear user data from local storage
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userData");
+    // Redirect to login page
+    navigate("/login");
   };
 
   if (loading) {
@@ -81,7 +89,9 @@ export default function Profile() {
       <div className="profile-information">
         <div className="left">
           <div>
-            <strong>{userProfile.firstName} {userProfile.lastName}</strong>
+            <strong>
+              {userProfile.firstName} {userProfile.lastName}
+            </strong>
           </div>
           <div>{userProfile.role || "Student"}</div>
           <div>{userProfile.bio}</div>
@@ -91,25 +101,11 @@ export default function Profile() {
           <button className="edit-profile-btn" onClick={handleEditClick}>
             Edit Profile
           </button>
+          <button className="logout-btn" onClick={handleLogoutClick}>
+            Logout
+          </button>
         </div>
       </div>
-      {/* <div className="favorite-cafes">
-        <h1>Favorite Cafes</h1>
-        <div className="cafe-grid">
-          {favoriteCafes.map((cafeId) => {
-            return (
-              <a href={`/cafe/${cafeId}`} key={cafeId}>
-                <CafeCard
-                  key={cafeId}
-                  className="cafe-card"
-                  image={`/images/cafe/cafe${cafeId}.jpg`}
-                  title={`Cafe ${cafeId}`}
-                />
-              </a>
-            );
-          })}
-        </div>
-      </div> */}
       {userReviews.length > 0 && (
         <div className="reviews" style={{ width: "100%" }}>
           <ReviewsSection reviews={userReviews} />

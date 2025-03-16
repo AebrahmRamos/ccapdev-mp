@@ -15,7 +15,6 @@ import CafeOwnerProfile from "./pages/CafeOwnerProfile";
 import "./App.css";
 
 function App() {
-
   return (
     <Router>
       <div className="app">
@@ -62,13 +61,16 @@ function App() {
               path="/profile"
               element={
                 <PrivateRoute>
-                  {
-                    localStorage.getItem('userData') ? 
-                    (JSON.parse(localStorage.getItem('userData')).role === 'Student' ?
-                    <Profile /> :
-                    <CafeOwnerProfile />) :
+                  {localStorage.getItem("userData") ? (
+                    JSON.parse(localStorage.getItem("userData")).role ===
+                    "Student" ? (
+                      <Profile />
+                    ) : (
+                      <CafeOwnerProfile />
+                    )
+                  ) : (
                     <Login />
-                  }
+                  )}
                 </PrivateRoute>
               }
             />

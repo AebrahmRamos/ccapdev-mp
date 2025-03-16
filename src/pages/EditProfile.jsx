@@ -1,13 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import "../styles/EditProfile.css";
 
 export default function EditProfile() {
   const [profileDetails, setProfileDetails] = useState({
     profilePic: "https://cdn-icons-png.flaticon.com/512/147/147285.png",
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     bio: "",
   });
+
+  useEffect(() => {
+    // Retrieve user data from local storage
+    const userData = localStorage.getItem("userData");
+    if (userData) {
+      const user = JSON.parse(userData);
+      setProfileDetails({
+        profilePic:
+          user.profilePicture ||
+          "https://cdn-icons-png.flaticon.com/512/147/147285.png",
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        bio: user.bio,
+      });
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,11 +50,30 @@ export default function EditProfile() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement actual update logic
-    console.log("Updated Profile Details:", profileDetails);
-    alert("Profile Updated!");
+    try {
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      const response = await axios.put("http://localhost:5500/api/profile", {
+        userId: userData._id,
+        profilePic: profileDetails.profilePic,
+        firstName: profileDetails.firstName,
+        lastName: profileDetails.lastName,
+        email: profileDetails.email,
+        bio: profileDetails.bio,
+      });
+
+      if (response.status === 200) {
+        // Update local storage with the new user data
+        localStorage.setItem("userData", JSON.stringify(response.data.user));
+        alert("Profile updated successfully!");
+      } else {
+        alert("Failed to update profile.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating the profile.");
+    }
   };
 
   return (
@@ -55,12 +93,23 @@ export default function EditProfile() {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="name">Name</label>
+          <label htmlFor="firstName">First Name</label>
           <input
             type="text"
-            id="name"
-            name="name"
-            value={profileDetails.name}
+            id="firstName"
+            name="firstName"
+            value={profileDetails.firstName}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="lastName">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={profileDetails.lastName}
             onChange={handleChange}
             required
           />

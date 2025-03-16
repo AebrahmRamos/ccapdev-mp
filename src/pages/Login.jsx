@@ -28,9 +28,9 @@ const Login = () => {
         "http://localhost:5500/api/login",
         formData
       );
-      
+
       console.log("Full response data:", response.data);
-      
+
       if (response.status === 200) {
         console.log("Login successful:", response.data.message);
         // Store the token
@@ -81,7 +81,7 @@ const Login = () => {
           </button>
         </form>
         <p className="signup-link">
-          Don&apos;t have an account? <a href="/signup">Sign up</a>
+          Don't have an account? <a href="/signup">Sign up</a>
         </p>
       </div>
     </div>
