@@ -402,9 +402,29 @@ app.post("/api/reviews", authenticateToken, async (req, res) => {
     });
 
     await newReview.save();
-    res
-      .status(201)
-      .json({ message: "Review submitted successfully", review: newReview });
+
+    const cafe = await Cafe.findOne({ _id: cafeId });
+    if (!cafe) {
+      return res.status(404).json({ message: `Cafe not found, id: ${cafeId}` });
+    }
+
+    const updatedTotalReviews = (cafe.totalReviews || 0) + 1;
+
+    // Update the cafe's total reviews and average ratings
+    await Cafe.updateOne(
+      { _id: cafeId },
+      {
+        $set: {
+          totalReviews: updatedTotalReviews,
+        },
+      }
+    );
+
+    res.status(201).json({
+      message: "Review submitted successfully",
+      review: newReview,
+      reviewsCount: updatedTotalReviews,
+    });
   } catch (error) {
     console.error("Error submitting review:", error);
     res.status(500).json({ message: "Internal server error" });
