@@ -71,51 +71,104 @@ async function connectToDatabase() {
 
     // Signup endpoint
     app.post("/api/signup", async (req, res) => {
-      const { firstName, lastName, email, password, role, cafeName } = req.body;
+      const { firstName, lastName, email, password, role, cafeName, address, operatingHours } = req.body;
+
+      const client = new MongoClient(process.env.ATLAS_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
 
       try {
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-          return res.status(400).json({ message: "User already exists" });
+        await client.connect();
+        const db = client.db("Cluster0");
+        const usersCollection = db.collection("users");
+        const cafesCollection = db.collection("cafes");
+
+        // Start a session for transaction
+        const session = client.startSession();
+        session.startTransaction();
+
+        try {
+          // Check if user already exists
+          const existingUser = await usersCollection.findOne({ email }, { session });
+          if (existingUser) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ message: "User already exists" });
+          }
+
+          // Create new user
+          const newUser = {
+            firstName,
+            lastName,
+            email,
+            password,
+            role,
+          };
+          await usersCollection.insertOne(newUser, { session });
+
+          if (role === "Cafe Owner") {
+            const existingCafe = await cafesCollection.findOne({ cafeName }, { session });
+            if (existingCafe) {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ message: "A cafe with that name already exists" });
+            }
+
+            const slug = cafeName.toLowerCase().replace(/\s+/g, '-');
+
+            const newCafe = {
+              cafeName,
+              address: address || "",
+              operatingHours: operatingHours || {
+                Monday: "",
+                Tuesday: "",
+                Wednesday: "",
+                Thursday: "",
+                Friday: "",
+                Saturday: "",
+                Sunday: "",
+              },
+              category: "Cafe",
+              totalReviews: 0,
+              averageReview: 0,
+              photos: [],
+              userReviews: [],
+              slug: slug,
+            };
+
+            await cafesCollection.insertOne(newCafe, { session });
+          }
+
+          await session.commitTransaction();
+          session.endSession();
+
+          res.status(201).json({ message: "Signup successful", user: { email, role } });
+
+        } catch (error) {
+          await session.abortTransaction();
+          session.endSession();
+
+          console.error("Error during signup:", error);
+
+          // Check for duplicate key errors
+          if (error.code === 11000) {
+            if (error.keyPattern && error.keyPattern.cafeName) {
+              return res.status(400).json({ message: "A cafe with that name already exists" });
+            }
+            if (error.keyPattern && error.keyPattern.slug) {
+              return res.status(400).json({ message: "Please choose a different cafe name" });
+            }
+            if (error.keyPattern && error.keyPattern.email) {
+              return res.status(400).json({ message: "Email already in use" });
+            }
+            return res.status(400).json({ message: "Duplicate entry detected" });
+          }
+
+          res.status(500).json({ message: "Internal server error", error: error.message });
         }
-
-        // Create new user
-        const newUser = new User({
-          firstName,
-          lastName,
-          email,
-          password,
-          role,
-        });
-
-        await newUser.save();
-
-        // If the user is a cafe owner, create a new cafe
-        if (role === "Cafe Owner") {
-          const newCafe = new Cafe({
-            cafeName,
-            ownerEmail: email,
-            address: "",
-            operatingHours: {
-              Monday: "",
-              Tuesday: "",
-              Wednesday: "",
-              Thursday: "",
-              Friday: "",
-              Saturday: "",
-              Sunday: "",
-            },
-            photos: [],
-          });
-
-          await newCafe.save();
-        }
-
-        res.status(201).json({ message: "Signup successful", user: newUser });
-      } catch (error) {
-        console.error("Error during signup:", error);
-        res.status(500).json({ message: "Internal server error", error });
+      } finally {
+        await client.close();
       }
     });
 
