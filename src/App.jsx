@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Signup from "./pages/Signup";
@@ -16,6 +17,15 @@ import CafeOwnerProfile from "./pages/CafeOwnerProfile";
 import "./App.css";
 
 function App() {
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const storedUserData = localStorage.getItem("userData");
+    if (storedUserData) {
+      setUserData(JSON.parse(storedUserData));
+    }
+  }, []);
+
   return (
     <Router>
       <div className="app">
@@ -70,9 +80,8 @@ function App() {
               path="/profile"
               element={
                 <PrivateRoute>
-                  {localStorage.getItem("userData") ? (
-                    JSON.parse(localStorage.getItem("userData")).role ===
-                    "Student" ? (
+                  {userData ? (
+                    userData.role === "Student" ? (
                       <Profile />
                     ) : (
                       <CafeOwnerProfile />

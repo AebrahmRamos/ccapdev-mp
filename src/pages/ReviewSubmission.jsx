@@ -35,7 +35,7 @@ const ReviewSubmission = () => {
     const fetchCafes = async () => {
       try {
         const response = await axios.get("http://localhost:5500/api/cafes");
-        setCafes(response.data.cafes);
+        setCafes(response.data);
       } catch (err) {
         console.error("Error fetching cafes:", err);
         setError("Failed to load cafes");
@@ -119,7 +119,12 @@ const ReviewSubmission = () => {
       // Submit review
       const response = await axios.post(
         "http://localhost:5500/api/reviews",
-        reviewData
+        reviewData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
       );
       console.log("Review submission response:", response.data);
 

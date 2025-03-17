@@ -14,18 +14,21 @@ const TrendingCafes = () => {
   const theme = useTheme();
   const [trendingCafes, setTrendingCafes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTrendingCafes = async () => {
       try {
         const response = await fetch("http://localhost:5500/api/cafes");
-        const data = await response.json();
+        if (!response.ok) {
+          throw new Error("Failed to fetch cafes");
+        }
+        const cafes = await response.json();
 
         // Calculate trending cafes based on review metrics
-        const processed = data.cafes
+        const processed = cafes
           .map((cafe) => ({
             ...cafe,
-            // Create a trending score combining review count and average rating
             trendingScore: cafe.totalReviews * cafe.averageReview,
           }))
           .sort((a, b) => b.trendingScore - a.trendingScore)
@@ -34,6 +37,7 @@ const TrendingCafes = () => {
         setTrendingCafes(processed);
       } catch (error) {
         console.error("Error fetching cafes:", error);
+        setError("Failed to load trending cafes. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -42,6 +46,7 @@ const TrendingCafes = () => {
     fetchTrendingCafes();
   }, []);
 
+  if (error) return <div>{error}</div>;
   if (loading) return <div>Loading trending cafes...</div>;
 
   return (
@@ -109,7 +114,11 @@ const TrendingCafes = () => {
                 sx={{ backgroundImage: "none" }}
               >
                 <CardMedia
-                  image={cafe.photos[0]} // Use first photo from API
+                  image={
+                    cafe.photos && cafe.photos.length > 0
+                      ? cafe.photos[0]
+                      : "https://via.placeholder.com/300"
+                  } // Fallback image
                   title={cafe.cafeName}
                   sx={{
                     height: { xs: 200, md: 260 },

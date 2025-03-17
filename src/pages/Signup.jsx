@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import "../styles/Signup.css";
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -33,20 +33,20 @@ const Signup = () => {
     Sunday: "",
   });
 
+  const [passwordError, setPasswordError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const operatingHoursRegex = /^((\d{1,2}(:\d{2})? (AM|PM) - \d{1,2}(:\d{2})? (AM|PM))|Closed)$/i;
 
   const validateOperatingHours = (value) => {
-    if (!value) return ""; // Allow empty values
-    if (value.toLowerCase() === "closed") return ""; // "Closed" is always valid
+    if (!value) return "";
+    if (value.toLowerCase() === "closed") return "";
 
     if (!operatingHoursRegex.test(value)) {
       return "Invalid format. Use '9 AM - 5 PM' or 'Closed'";
     }
 
-    // Check if the time is valid
     const parts = value.split(" - ");
     if (parts.length === 2) {
       const startTime = parts[0].trim();
@@ -60,39 +60,42 @@ const Signup = () => {
     return "";
   };
 
-const isValidTimeRange = (startTime, endTime) => {
-  const start = convertTo24Hour(startTime);
-  const end = convertTo24Hour(endTime);
+  const isValidTimeRange = (startTime, endTime) => {
+    const start = convertTo24Hour(startTime);
+    const end = convertTo24Hour(endTime);
 
-  if (start === null || end === null) {
-    return false; // Invalid time format
-  }
+    if (start === null || end === null) {
+      return false;
+    }
 
-  return end > start;
-};
+    return end > start;
+  };
 
-const convertTo24Hour = (time) => {
-  const [timeValue, ampm] = time.split(" ");
-  const [hours, minutes] = timeValue.split(":");
+  const convertTo24Hour = (time) => {
+    const [timeValue, ampm] = time.split(" ");
+    const [hours, minutes] = timeValue.split(":");
 
-  let hour = parseInt(hours);
-  const minute = minutes ? parseInt(minutes) : 0;
+    let hour = parseInt(hours);
+    const minute = minutes ? parseInt(minutes) : 0;
 
-  if (isNaN(hour) || isNaN(minute)) {
-    return null; // Invalid time format
-  }
+    if (isNaN(hour) || isNaN(minute)) {
+      return null;
+    }
 
-  if (ampm.toLowerCase() === "pm" && hour !== 12) {
-    hour += 12;
-  } else if (ampm.toLowerCase() === "am" && hour === 12) {
-    hour = 0;
-  }
+    if (ampm.toLowerCase() === "pm" && hour !== 12) {
+      hour += 12;
+    } else if (ampm.toLowerCase() === "am" && hour === 12) {
+      hour = 0;
+    }
 
-  return hour + minute / 60; // Return time in 24-hour format as a decimal
-};
+    return hour + minute / 60;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "password") {
+      setPasswordError(value.length < 6 ? "Password must be at least 6 characters long." : "");
+    }
     if (name.startsWith("operatingHours.")) {
       const day = name.split(".")[1];
       const error = validateOperatingHours(value);
@@ -118,7 +121,11 @@ const convertTo24Hour = (time) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check for operating hours errors before submitting
+    if (passwordError) {
+      setErrorMessage("Please correct the password error.");
+      return;
+    }
+
     if (Object.values(operatingHoursErrors).some((error) => error !== "")) {
       setErrorMessage("Please correct the operating hours errors.");
       return;
@@ -126,19 +133,36 @@ const convertTo24Hour = (time) => {
 
     try {
       console.log("Sending signup request with data:", formData);
-      const response = await axios.post(
-        "http://localhost:5500/api/signup",
-        formData
-      );
+      let signupEndpoint = "";
+      const signupData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+      };
 
-      if (response.status === 201) {
-        console.log("Signup successful:", response.data);
-        alert(`Sign-up successful as ${formData.role}!`);
-        // Redirect to login page for both user types
-        navigate('/login');
+      if (formData.role === "Student") {
+        signupEndpoint = "http://localhost:5500/api/signup/student";
+      } else if (formData.role === "Cafe Owner") {
+        signupEndpoint = "http://localhost:5500/api/signup/cafe-owner";
+        signupData.cafeName = formData.cafeName;
+        signupData.address = formData.address;
+        signupData.operatingHours = formData.operatingHours;
+      }
+
+      if (signupEndpoint) {
+        const response = await axios.post(signupEndpoint, signupData);
+
+        if (response.status === 201) {
+          console.log("Signup successful:", response.data);
+          alert(`Sign-up successful as ${formData.role}!`);
+          navigate('/login');
+        } else {
+          console.log("Signup failed:", response.data.message);
+          setErrorMessage(response.data.message);
+        }
       } else {
-        console.log("Signup failed:", response.data.message);
-        setErrorMessage(response.data.message);
+        setErrorMessage("Please select a role to sign up as.");
       }
     } catch (error) {
       console.error("An error occurred:", error);
@@ -212,6 +236,7 @@ const convertTo24Hour = (time) => {
               onChange={handleChange}
               required
             />
+            {passwordError && <p className="error-message">{passwordError}</p>}
           </div>
 
           {formData.role === "Cafe Owner" && (

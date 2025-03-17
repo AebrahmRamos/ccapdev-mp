@@ -1,19 +1,24 @@
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
-const { MongoClient, ObjectId } = require("mongodb");
+const mongoose = require("mongoose");
+const { check, validationResult } = require("express-validator");
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "config.env") });
-const mongoose = require("mongoose");
+
+// Import Mongoose models
 const Review = require("./Models/Review.cjs");
 const Cafe = require("./Models/Cafe.cjs");
 const User = require("./Models/Users.cjs");
 
+// Initialize Express app
 const app = express();
 const port = process.env.PORT || 5500;
 
-app.use(cors({ origin: "*" })); // Updated CORS configuration to allow all origins
+// Middleware
+app.use(cors({ origin: process.env.ALLOWED_ORIGINS || "*" })); // Restrict CORS in production
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 
@@ -22,6 +27,7 @@ mongoose
   .connect(process.env.ATLAS_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    dbName: "Cluster0", // Explicitly specify the database name
   })
   .then(() => console.log("Successfully connected to MongoDB"))
   .catch((error) => {
@@ -29,6 +35,7 @@ mongoose
     process.exit(1);
   });
 
+// JWT Authentication Middleware
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(" ")[1];
@@ -44,850 +51,349 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-async function connectToDatabase() {
+// Helper function to generate a unique slug
+const generateSlug = (name) => {
+  return name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
+};
+
+// Login Endpoint
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    const client = new MongoClient(process.env.ATLAS_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const user = await User.findOne({ email });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
 
-    await client.connect();
-    console.log("Successfully connected to the database");
-
-    const db = client.db("Cluster0");
-    const usersCollection = db.collection("users");
-    const cafesCollection = db.collection("cafes");
-    const reviewsCollection = db.collection("reviews");
-
-    const { default: generateSlug } = await import(
-      "../src/utils/slugGenerator.js"
-    );
-    // Test the connection by listing the databases
-    const databasesList = await client.db().admin().listDatabases();
-    console.log("Databases:");
-    databasesList.databases.forEach((dbInfo) =>
-      console.log(` - ${dbInfo.name}`)
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
     );
 
-    // Signup endpoint
-    app.post("/api/signup", async (req, res) => {
-      const { firstName, lastName, email, password, role, cafeName, address, operatingHours } = req.body;
+    // Return token and user data (excluding password)
+    const userData = { ...user.toObject(), password: undefined };
+    res.status(200).json({ message: "Login successful", token, user: userData });
+  } catch (error) {
+    console.error("Error during login", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
-      const client = new MongoClient(process.env.ATLAS_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
+// Signup as Student Endpoint
+app.post(
+  "/api/signup/student",
+  [
+    check("firstName").notEmpty().trim(),
+    check("lastName").notEmpty().trim(),
+    check("email").isEmail().normalizeEmail(),
+    check("password").isLength({ min: 6 }),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { firstName, lastName, email, password } = req.body;
+
+    try {
+      // Check if user already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Create new user
+      const newUser = new User({
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        role: "Student",
       });
 
-      try {
-        await client.connect();
-        const db = client.db("Cluster0");
-        const usersCollection = db.collection("users");
-        const cafesCollection = db.collection("cafes");
-
-        // Start a session for transaction
-        const session = client.startSession();
-        session.startTransaction();
-
-        try {
-          // Check if user already exists
-          const existingUser = await usersCollection.findOne({ email }, { session });
-          if (existingUser) {
-            await session.abortTransaction();
-            session.endSession();
-            return res.status(400).json({ message: "User already exists" });
-          }
-
-          // Create new user
-          const newUser = {
-            firstName,
-            lastName,
-            email,
-            password,
-            role,
-          };
-          await usersCollection.insertOne(newUser, { session });
-
-          if (role === "Cafe Owner") {
-            const existingCafe = await cafesCollection.findOne({ cafeName }, { session });
-            if (existingCafe) {
-              await session.abortTransaction();
-              session.endSession();
-              return res.status(400).json({ message: "A cafe with that name already exists" });
-            }
-
-            const slug = cafeName.toLowerCase().replace(/\s+/g, '-');
-
-            const newCafe = {
-              cafeName,
-              address: address || "",
-              operatingHours: operatingHours || {
-                Monday: "",
-                Tuesday: "",
-                Wednesday: "",
-                Thursday: "",
-                Friday: "",
-                Saturday: "",
-                Sunday: "",
-              },
-              category: "Cafe",
-              totalReviews: 0,
-              averageReview: 0,
-              photos: [],
-              userReviews: [],
-              slug: slug,
-            };
-
-            await cafesCollection.insertOne(newCafe, { session });
-          }
-
-          await session.commitTransaction();
-          session.endSession();
-
-          res.status(201).json({ message: "Signup successful", user: { email, role } });
-
-        } catch (error) {
-          await session.abortTransaction();
-          session.endSession();
-
-          console.error("Error during signup:", error);
-
-          // Check for duplicate key errors
-          if (error.code === 11000) {
-            if (error.keyPattern && error.keyPattern.cafeName) {
-              return res.status(400).json({ message: "A cafe with that name already exists" });
-            }
-            if (error.keyPattern && error.keyPattern.slug) {
-              return res.status(400).json({ message: "Please choose a different cafe name" });
-            }
-            if (error.keyPattern && error.keyPattern.email) {
-              return res.status(400).json({ message: "Email already in use" });
-            }
-            return res.status(400).json({ message: "Duplicate entry detected" });
-          }
-
-          res.status(500).json({ message: "Internal server error", error: error.message });
-        }
-      } finally {
-        await client.close();
-      }
-    });
-
-    // Login route
-    app.post("/api/login", async (req, res) => {
-      const { email, password } = req.body;
-      console.log(`Login attempt with email: ${email}`);
-      try {
-        const user = await usersCollection.findOne({ email, password });
-        if (user) {
-          console.log("User found:", user);
-          // Generate a JWT token
-          const token = jwt.sign(
-            { userId: user._id, email: user.email, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-          );
-
-          // Return both token and user data (you can omit sensitive fields like password)
-          const userData = { ...user, password: undefined };
-          res.status(200).json({
-            message: "Login successful",
-            token,
-            user: userData,
-          });
-        } else {
-          console.log("Invalid email or password");
-          res.status(401).json({ message: "Invalid email or password" });
-        }
-      } catch (error) {
-        console.error("Error during login", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    // Review submission endpoint
-    app.post("/api/reviews", async (req, res) => {
-      const { cafeId, userId, rating, textReview, photos } = req.body;
-
-      try {
-        const newReview = new Review({
-          cafeId: new ObjectId(cafeId),
-          userId: new ObjectId(userId),
-          rating,
-          textReview,
-          photos,
-          date: new Date(),
-        });
-
-        await newReview.save();
-
-        res.status(201).json({
-          message: "Review submitted successfully",
-          review: newReview,
-        });
-      } catch (error) {
-        console.error("Error submitting review", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    // Profile update endpoint
-    app.put("/api/profile", async (req, res) => {
-      const { userId, profilePic, firstName, lastName, email, bio } = req.body;
-
-      try {
-        console.log("Updating profile for user ID:", userId); // Add logging
-
-        // Verify if userId is a valid ObjectId
-        if (!ObjectId.isValid(userId)) {
-          console.log("Invalid user ID format:", userId); // Add logging
-          return res.status(400).json({ message: "Invalid user ID format" });
-        }
-
-        const updatedUser = await User.findByIdAndUpdate(
-          ObjectId(userId), // Use ObjectId(userId)
-          {
-            profilePicture: profilePic,
-            firstName,
-            lastName,
-            email,
-            bio,
-          },
-          { new: true }
-        );
-
-        if (!updatedUser) {
-          console.log("User not found:", userId); // Add logging
-          return res.status(404).json({ message: "User not found" });
-        }
-
-        console.log("Profile updated successfully for user ID:", userId); // Add logging
-        res
-          .status(200)
-          .json({ message: "Profile updated successfully", user: updatedUser });
-      } catch (error) {
-        console.error("Error updating profile:", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    // Cafe endpoints
-    app.get("/api/cafes", async (req, res) => {
-      try {
-        const cafes = await cafesCollection.find({}).toArray();
-        // console.log("Cafes fetched:", cafes);
-        res.status(200).json({ cafes });
-      } catch (error) {
-        console.error("Error fetching cafes", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    app.get("/api/cafes/search", async (req, res) => {
-      const cafeName = req.query.name;
-      if (!cafeName) {
-        return res.status(400).json({ message: "Cafe name is required" });
-      }
-      try {
-        const cafe = await cafesCollection.findOne({
-          cafeName: { $regex: new RegExp(`^${cafeName}$`, "i") },
-        });
-        if (!cafe) {
-          return res.status(404).json({ message: "Cafe not found" });
-        }
-        res.status(200).json(cafe);
-      } catch (error) {
-        console.error("Error searching for cafe", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    app.post("/api/cafes", async (req, res) => {
-      try {
-        const { cafeName, address, operatingHours, photos, userReviews } =
-          req.body;
-
-        // Generate a slug from the cafe name
-        const slug = generateSlug(cafeName);
-        const newCafe = {
-          cafeName,
-          slug, // Store the slug in the database
-          address,
-          operatingHours,
-          photos,
-          userReviews,
-        };
-
-        const result = await cafesCollection.insertOne(newCafe);
-        res.status(201).json({
-          message: "Cafe created successfully",
-          insertedId: result.insertedId,
-        });
-      } catch (error) {
-        console.error("Error creating cafe:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
-    });
-
-    app.get("/api/cafes/:slug", async (req, res) => {
-      try {
-        const slug = req.params.slug;
-        const cafe = await cafesCollection.findOne({ slug });
-        if (!cafe) return res.status(404).json({ error: "Cafe not found" });
-        res.json(cafe); // Return the cafe directly
-      } catch (error) {
-        res.status(500).json({ error: "Internal server error" });
-      }
-    });
-
-    app.put("/api/cafes/:slug", async (req, res) => {
-      try {
-        const slug = req.params.slug;
-        const updatedData = req.body;
-        // Generate new slug if cafe name is being updated
-        if (updatedData.cafeName) {
-          updatedData.slug = generateSlug(updatedData.cafeName);
-        }
-        const result = await cafesCollection.updateOne(
-          { slug },
-          { $set: updatedData }
-        );
-        if (result.matchedCount === 0) {
-          return res.status(404).json({ message: "Cafe not found" });
-        }
-        res.status(200).json({ message: "Cafe updated successfully" });
-      } catch (error) {
-        console.error("Error updating cafe", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    app.delete("/api/cafes/:slug", async (req, res) => {
-      try {
-        const slug = req.params.slug;
-        const result = await cafesCollection.deleteOne({ slug });
-        if (result.deletedCount === 0) {
-          return res.status(404).json({ message: "Cafe not found" });
-        }
-        res.status(200).json({ message: "Cafe deleted successfully" });
-      } catch (error) {
-        console.error("Error deleting cafe", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    // User endpoints
-    app.post("/api/users", async (req, res) => {
-      try {
-        const newUser = req.body;
-        const existingUser = await usersCollection.findOne({
-          email: newUser.email,
-        });
-        if (existingUser) {
-          return res.status(400).json({ message: "User already exists" });
-        }
-        const result = await usersCollection.insertOne(newUser);
-        res.status(201).json({
-          message: "User created successfully",
-          insertedId: result.insertedId,
-        });
-      } catch (error) {
-        console.error("Error creating user", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    app.get("/api/users/:id", authenticateToken, async (req, res) => {
-      try {
-        const id = req.params.id;
-        console.log(`Fetching user with ID: ${id}`); // Add logging
-        if (!ObjectId.isValid(id)) {
-          console.log("Invalid user ID format"); // Add logging
-          return res.status(400).json({ message: "Invalid user ID format" });
-        }
-        const user = await usersCollection.findOne({ _id: new ObjectId(id) });
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json(user);
-      } catch (error) {
-        console.error("Error fetching user", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    app.put("/api/users/:email", async (req, res) => {
-      try {
-        const email = req.params.email;
-        const updatedData = req.body;
-        const result = await usersCollection.updateOne(
-          { email },
-          { $set: updatedData }
-        );
-        if (result.matchedCount === 0) {
-          return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json({ message: "User updated successfully" });
-      } catch (error) {
-        console.error("Error updating user", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    app.delete("/api/users/:email", async (req, res) => {
-      try {
-        const email = req.params.email;
-        const result = await usersCollection.deleteOne({ email });
-        if (result.deletedCount === 0) {
-          return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json({ message: "User deleted successfully" });
-      } catch (error) {
-        console.error("Error deleting user", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    // Review endpoints
-    app.post("/api/reviews", async (req, res) => {
-      const session = client.startSession(); // Start a new session
-      try {
-        const { cafeId, userId, rating, textReview, photos, videos } = req.body;
-
-        // Validate required fields
-        if (!cafeId || !userId || !rating || !textReview) {
-          return res.status(400).json({ message: "Missing required fields" });
-        }
-
-        // Validate rating format
-        const requiredRatingCategories = [
-          "ambiance",
-          "drinkQuality",
-          "service",
-          "wifiReliability",
-          "cleanliness",
-          "valueForMoney",
-        ];
-        const hasAllRatingCategories = requiredRatingCategories.every(
-          (category) =>
-            typeof rating[category] === "number" &&
-            rating[category] >= 1 &&
-            rating[category] <= 5
-        );
-
-        if (!hasAllRatingCategories) {
-          return res.status(400).json({
-            message:
-              "Invalid rating format. All categories must be rated between 1 and 5.",
-          });
-        }
-
-        // Start a transaction
-        session.startTransaction();
-
-        // Check if a review by the same user for the same cafe already exists
-        const existingReview = await reviewsCollection.findOne(
-          { cafeId, userId },
-          { session }
-        );
-        if (existingReview) {
-          await session.abortTransaction();
-          session.endSession();
-          return res
-            .status(409)
-            .json({ message: "You have already reviewed this cafe." });
-        }
-
-        // Calculate average rating
-        const averageRating =
-          Object.values(rating).reduce((sum, val) => sum + val, 0) /
-          Object.keys(rating).length;
-
-        // Create the new review
-        const newReview = {
-          cafeId,
-          userId,
-          rating,
-          textReview,
-          photos: photos || [],
-          videos: videos || [],
-          date: new Date(),
-        };
-
-        // Insert the new review
-        const reviewResult = await reviewsCollection.insertOne(newReview, {
-          session,
-        });
-
-        // Find the cafe and update its review stats
-        const cafe = await cafesCollection.findOne(
-          { _id: new ObjectId(cafeId) },
-          { session }
-        );
-        if (!cafe) {
-          await session.abortTransaction();
-          session.endSession();
-          return res
-            .status(404)
-            .json({ message: `Cafe not found, id: ${cafeId}` });
-        }
-
-        // Update the cafe's review statistics
-        const updatedTotalReviews = (cafe.totalReviews || 0) + 1;
-
-        // Initialize averageRating if it doesn't exist
-        cafe.averageRating = cafe.averageRating || {};
-
-        // Update each rating category
-        for (const category of requiredRatingCategories) {
-          const currentTotal =
-            (cafe.averageRating[category] || 0) * (cafe.totalReviews || 0);
-          cafe.averageRating[category] =
-            (currentTotal + rating[category]) / updatedTotalReviews;
-        }
-
-        // Update overall average
-        const currentOverallTotal =
-          (cafe.averageRating.overall || 0) * (cafe.totalReviews || 0);
-        cafe.averageRating.overall =
-          (currentOverallTotal + averageRating) / updatedTotalReviews;
-
-        // Update the cafe's total reviews and average ratings
-        await cafesCollection.updateOne(
-          { _id: new ObjectId(cafeId) },
-          {
-            $set: {
-              totalReviews: updatedTotalReviews,
-              averageRating: cafe.averageRating,
-            },
-          },
-          { session }
-        );
-
-        // Commit the transaction
-        await session.commitTransaction();
-        session.endSession();
-
-        res.status(201).json({
-          message: "Review created successfully",
-          review: newReview,
-          averageRating: cafe.averageRating,
-        });
-      } catch (error) {
-        // Abort the transaction on error
-        await session.abortTransaction();
-        session.endSession();
-        console.error("Error creating review:", error);
-        res
-          .status(500)
-          .json({ message: "Internal server error", error: error.message });
-      }
-    });
-
-    app.get("/api/reviews/:id", async (req, res) => {
-      try {
-        const reviewId = req.params.id;
-
-        if (!ObjectId.isValid(reviewId)) {
-          return res.status(400).json({ message: "Invalid review ID format" });
-        }
-
-        const review = await Review.findById(reviewId);
-
-        if (!review) {
-          return res.status(404).json({ message: "Review not found" });
-        }
-
-        res.status(200).json(review);
-      } catch (error) {
-        console.error("Error fetching review", error);
-        res
-          .status(500)
-          .json({ message: "Internal server error", error: error.message });
-      }
-    });
-
-    app.put("/api/reviews/:id", async (req, res) => {
-      try {
-        const reviewId = req.params.id;
-        const updatedData = req.body;
-
-        if (!ObjectId.isValid(reviewId)) {
-          return res.status(400).json({ message: "Invalid review ID format" });
-        }
-
-        // Validate updated data if needed
-        if (updatedData.rating) {
-          const requiredRatingCategories = [
-            "ambiance",
-            "drinkQuality",
-            "service",
-            "wifiReliability",
-            "cleanliness",
-            "valueForMoney",
-          ];
-          const hasAllRatingCategories = requiredRatingCategories.every(
-            (category) =>
-              typeof updatedData.rating[category] === "number" &&
-              updatedData.rating[category] >= 1 &&
-              updatedData.rating[category] <= 5
-          );
-
-          if (!hasAllRatingCategories) {
-            return res
-              .status(400)
-              .json({ message: "Invalid rating format in update" });
-          }
-        }
-
-        // Find the review first to get the old values
-        const oldReview = await Review.findById(reviewId);
-        if (!oldReview) {
-          return res.status(404).json({ message: "Review not found" });
-        }
-
-        // Update the review
-        const result = await Review.findByIdAndUpdate(
-          reviewId,
-          { $set: updatedData },
-          { new: true } // Return the updated document
-        );
-
-        // If rating was updated, update the cafe's average ratings
-        if (updatedData.rating && oldReview.cafeId) {
-          const cafe = await Cafe.findById(oldReview.cafeId);
-          if (cafe) {
-            // Initialize averageRating if it doesn't exist
-            cafe.averageRating = cafe.averageRating || {};
-            cafe.totalReviews = cafe.totalReviews || 0;
-
-            if (cafe.totalReviews > 0) {
-              // For each rating category, update the average
-              const requiredRatingCategories = [
-                "ambiance",
-                "drinkQuality",
-                "service",
-                "wifiReliability",
-                "cleanliness",
-                "valueForMoney",
-              ];
-              for (const category of requiredRatingCategories) {
-                // Remove old rating contribution and add new one
-                const totalWithoutOld =
-                  (cafe.averageRating[category] || 0) * cafe.totalReviews -
-                  (oldReview.rating[category] || 0);
-                cafe.averageRating[category] =
-                  (totalWithoutOld + updatedData.rating[category]) /
-                  cafe.totalReviews;
-              }
-
-              // Update overall rating
-              const newAvg =
-                Object.values(updatedData.rating).reduce(
-                  (sum, val) => sum + val,
-                  0
-                ) / Object.keys(updatedData.rating).length;
-              const oldAvg =
-                Object.values(oldReview.rating).reduce(
-                  (sum, val) => sum + val,
-                  0
-                ) / Object.keys(oldReview.rating).length;
-
-              const totalOverallWithoutOld =
-                (cafe.averageRating.overall || 0) * cafe.totalReviews - oldAvg;
-              cafe.averageRating.overall =
-                (totalOverallWithoutOld + newAvg) / cafe.totalReviews;
-
-              await cafe.save();
-            }
-          }
-        }
-
-        res
-          .status(200)
-          .json({ message: "Review updated successfully", review: result });
-      } catch (error) {
-        console.error("Error updating review", error);
-        res
-          .status(500)
-          .json({ message: "Internal server error", error: error.message });
-      }
-    });
-
-    app.delete("/api/reviews/:id", async (req, res) => {
-      try {
-        const reviewId = req.params.id;
-
-        if (!ObjectId.isValid(reviewId)) {
-          return res.status(400).json({ message: "Invalid review ID format" });
-        }
-
-        // Find the review first to get cafe info
-        const review = await Review.findById(reviewId);
-        if (!review) {
-          return res.status(404).json({ message: "Review not found" });
-        }
-
-        // Delete the review
-        const result = await Review.findByIdAndDelete(reviewId);
-
-        // Update cafe stats
-        if (review.cafeId) {
-          const cafe = await Cafe.findById(review.cafeId);
-          if (cafe && cafe.totalReviews > 0) {
-            // Decrement the total review count
-            cafe.totalReviews -= 1;
-
-            // If this was the last review, reset averages
-            if (cafe.totalReviews === 0) {
-              cafe.averageRating = {
-                ambiance: 0,
-                drinkQuality: 0,
-                service: 0,
-                wifiReliability: 0,
-                cleanliness: 0,
-                valueForMoney: 0,
-                overall: 0,
-              };
-            } else {
-              // Otherwise recalculate averages without this review
-              const allCafeReviews = await Review.find({
-                cafeId: review.cafeId,
-              });
-
-              // Calculate new averages for each category
-              const requiredRatingCategories = [
-                "ambiance",
-                "drinkQuality",
-                "service",
-                "wifiReliability",
-                "cleanliness",
-                "valueForMoney",
-              ];
-              const categoryTotals = {};
-              let overallTotal = 0;
-
-              // Sum up all ratings
-              allCafeReviews.forEach((rev) => {
-                for (const category of requiredRatingCategories) {
-                  categoryTotals[category] =
-                    (categoryTotals[category] || 0) +
-                    (rev.rating[category] || 0);
-                }
-
-                // Calculate review's overall rating and add to total
-                const reviewAvg =
-                  Object.values(rev.rating).reduce((sum, val) => sum + val, 0) /
-                  Object.keys(rev.rating).length;
-                overallTotal += reviewAvg;
-              });
-
-              // Calculate new averages
-              for (const category of requiredRatingCategories) {
-                cafe.averageRating[category] =
-                  categoryTotals[category] / allCafeReviews.length;
-              }
-              cafe.averageRating.overall = overallTotal / allCafeReviews.length;
-            }
-
-            await cafe.save();
-          }
-        }
-
-        res.status(200).json({ message: "Review deleted successfully" });
-      } catch (error) {
-        console.error("Error deleting review", error);
-        res
-          .status(500)
-          .json({ message: "Internal server error", error: error.message });
-      }
-    });
-
-    app.get("/api/reviews/user/:userId", async (req, res) => {
-      try {
-        const userId = req.params.userId;
-        const reviews = await reviewsCollection.find({ userId }).toArray();
-        res.status(200).json(reviews);
-      } catch (error) {
-        console.error("Error fetching user reviews", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    app.get("/api/reviews/cafe/:cafeId", async (req, res) => {
-      try {
-        const cafeId = req.params.cafeId;
-        let reviews;
-        if (ObjectId.isValid(cafeId)) {
-          reviews = await reviewsCollection.find({ cafeId }).toArray();
-        } else {
-          reviews = await reviewsCollection.find({ cafeId: cafeId }).toArray();
-        }
-        res.status(200).json(reviews);
-      } catch (error) {
-        console.error("Error fetching cafe reviews:", error);
-        res
-          .status(500)
-          .json({ message: "Internal server error", error: error.message });
-      }
-    });
-
-    // Endpoint to fetch cafe data based on user email
-    app.get("/api/cafe", async (req, res) => {
-      const { email } = req.query;
-
-      try {
-        const user = await User.findOne({ email });
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
-        }
-
-        const cafe = await Cafe.findOne({ ownerEmail: email });
-        if (!cafe) {
-          return res.status(404).json({ message: "Cafe not found" });
-        }
-
-        res.status(200).json({ user, cafe });
-      } catch (error) {
-        console.error("Error fetching cafe data:", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    // Endpoint to update cafe data
-    app.put("/api/cafe", async (req, res) => {
-      const { email, cafeName, address, operatingHours, photos } = req.body;
-
-      try {
-        const cafe = await Cafe.findOneAndUpdate(
-          { ownerEmail: email },
-          {
-            cafeName,
-            address,
-            operatingHours,
-            photos,
-          },
-          { new: true }
-        );
-
-        if (!cafe) {
-          return res.status(404).json({ message: "Cafe not found" });
-        }
-
-        res.status(200).json({ message: "Cafe updated successfully", cafe });
-      } catch (error) {
-        console.error("Error updating cafe:", error);
-        res.status(500).json({ message: "Internal server error", error });
-      }
-    });
-
-    // Start the server
-    app.listen(port, () => {
-      console.log(`Server is running on port: ${port}`);
-    });
-  } catch (e) {
-    console.error("Error connecting to the database", e);
-    process.exit(1);
+      await newUser.save();
+      res.status(201).json({ message: "Student signup successful", user: newUser });
+    } catch (error) {
+      console.error("Error during student signup:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
   }
-}
+);
 
-connectToDatabase();
+// Signup as Cafe Owner Endpoint
+app.post(
+  "/api/signup/cafe-owner",
+  [
+    check("firstName").notEmpty().trim(),
+    check("lastName").notEmpty().trim(),
+    check("email").isEmail().normalizeEmail(),
+    check("password").isLength({ min: 6 }),
+    check("cafeName").notEmpty().trim(),
+    check("address").notEmpty().trim(),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { firstName, lastName, email, password, cafeName, address, category, operatingHours } = req.body;
+
+    try {
+      // Check if user already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Create new user
+      const newUser = new User({
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        role: "Cafe Owner",
+        bio: "Enter your bio here",
+        profilePicture: "https://cdn-icons-png.flaticon.com/512/147/147285.png",
+        cafeName,
+      });
+
+      await newUser.save();
+
+      // Create cafe
+      const slug = generateSlug(cafeName);
+      const newCafe = new Cafe({
+        cafeName,
+        slug,
+        category: category || "Cafe",
+        address,
+        operatingHours: operatingHours || {
+          Monday: "",
+          Tuesday: "",
+          Wednesday: "",
+          Thursday: "",
+          Friday: "",
+          Saturday: "",
+          Sunday: "",
+        },
+        ownerId: newUser._id, // Link cafe to owner
+      });
+
+      await newCafe.save();
+      res.status(201).json({ message: "Cafe owner signup successful", user: newUser, cafe: newCafe });
+    } catch (error) {
+      console.error("Error during cafe owner signup:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+);
+
+// CRUD User Endpoints
+app.get("/api/users/:id", authenticateToken, async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.put("/api/users/:id", authenticateToken, async (req, res) => {
+  const userId = req.params.id;
+  const { firstName, lastName, email, profilePicture, bio } = req.body;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { firstName, lastName, email, profilePicture, bio },
+      { new: true }
+    );
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ message: "User updated successfully", user: updatedUser });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.delete("/api/users/:id", authenticateToken, async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const deletedUser = await User.findByIdAndDelete(userId);
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// CRUD Cafe Endpoints
+app.get("/api/cafes", async (req, res) => {
+  try {
+    const cafes = await Cafe.find();
+    res.status(200).json(cafes);
+  } catch (error) {
+    console.error("Error fetching cafes:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/api/cafes/:slug", async (req, res) => {
+  const slug = req.params.slug;
+
+  try {
+    const cafe = await Cafe.findOne({ slug });
+    if (!cafe) {
+      return res.status(404).json({ message: "Cafe not found" });
+    }
+    res.status(200).json(cafe);
+  } catch (error) {
+    console.error("Error fetching cafe:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.put("/api/cafes/:slug", authenticateToken, async (req, res) => {
+  const slug = req.params.slug;
+  const { cafeName, address, category, operatingHours, photos } = req.body;
+
+  try {
+    const cafe = await Cafe.findOne({ slug, ownerId: req.user.userId });
+    if (!cafe) {
+      return res.status(404).json({ message: "Cafe not found or unauthorized" });
+    }
+
+    if (cafeName) {
+      cafe.cafeName = cafeName;
+      cafe.slug = generateSlug(cafeName);
+    }
+    if (address) cafe.address = address;
+    if (category) cafe.category = category;
+    if (operatingHours) cafe.operatingHours = operatingHours;
+    if (photos) cafe.photos = photos;
+
+    await cafe.save();
+    res.status(200).json({ message: "Cafe updated successfully", cafe });
+  } catch (error) {
+    console.error("Error updating cafe:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.delete("/api/cafes/:slug", authenticateToken, async (req, res) => {
+  const slug = req.params.slug;
+
+  try {
+    const cafe = await Cafe.findOneAndDelete({ slug, ownerId: req.user.userId });
+    if (!cafe) {
+      return res.status(404).json({ message: "Cafe not found or unauthorized" });
+    }
+    res.status(200).json({ message: "Cafe deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting cafe:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// CRUD Review Endpoints
+app.post("/api/reviews", authenticateToken, async (req, res) => {
+  const { cafeId, rating, textReview, photos, videos } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    // Validate rating fields
+    const requiredRatingFields = ["ambiance", "drinkQuality", "service", "wifiReliability", "cleanliness", "valueForMoney"];
+    for (const field of requiredRatingFields) {
+      if (!rating[field] || rating[field] < 1 || rating[field] > 5) {
+        return res.status(400).json({ message: `Invalid rating for ${field}` });
+      }
+    }
+
+    // Validate textReview length
+    if (textReview.length < 10 || textReview.length > 1000) {
+      return res.status(400).json({ message: "Text review must be between 10 and 1000 characters" });
+    }
+
+    const newReview = new Review({
+      cafeId,
+      userId,
+      rating,
+      textReview,
+      photos: photos || [],
+      videos: videos || [],
+    });
+
+    await newReview.save();
+    res.status(201).json({ message: "Review submitted successfully", review: newReview });
+  } catch (error) {
+    console.error("Error submitting review:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/api/reviews/cafe/:cafeId", async (req, res) => {
+  let cafeId = req.params.cafeId;
+
+  try {
+    cafeId = cafeId.trim();
+    const reviews = await Review.find({ cafeId: cafeId });
+    res.status(200).json(reviews);
+  } catch (error) {
+    console.error("Error fetching reviews by cafe:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/api/reviews/user/:userId", authenticateToken, async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const reviews = await Review.find({ userId });
+    res.status(200).json(reviews);
+  } catch (error) {
+    console.error("Error fetching reviews by user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.delete("/api/reviews/:id", authenticateToken, async (req, res) => {
+  const reviewId = req.params.id;
+
+  try {
+    const review = await Review.findByIdAndDelete(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+    res.status(200).json({ message: "Review deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting review:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port: ${port}`);
+});

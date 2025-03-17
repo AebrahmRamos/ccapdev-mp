@@ -2,14 +2,22 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const reviewSchema = new Schema({
+  // cafeId: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'Cafe',
+  //   required: true
+  // },
   cafeId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Cafe',
+    type: String,
     required: true
   },
+  // userId: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'User',
+  //   required: true
+  // },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: String,
     required: true
   },
   rating: {
@@ -74,6 +82,8 @@ const reviewSchema = new Schema({
     type: Boolean,
     default: false
   }
+}, {
+  collection: "reviews"
 });
 
 // Virtual property to calculate average rating

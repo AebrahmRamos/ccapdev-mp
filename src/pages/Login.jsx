@@ -24,9 +24,15 @@ const Login = () => {
     e.preventDefault();
     try {
       console.log("Sending login request with data:", formData);
+      // Normalize email to lowercase
+      const normalizedFormData = {
+        ...formData,
+        email: formData.email.toLowerCase(),
+      };
+
       const response = await axios.post(
         "http://localhost:5500/api/login",
-        formData
+        normalizedFormData
       );
 
       console.log("Full response data:", response.data);

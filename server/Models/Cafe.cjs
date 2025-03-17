@@ -53,9 +53,6 @@ const cafeSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-});
-
-// cafeSchema.index({ cafeName: 1 }, { unique: true });
-// cafeSchema.index({ slug: 1 }, { unique: true });
+}, { collection: 'cafes' });
 
 module.exports = mongoose.model('Cafe', cafeSchema);

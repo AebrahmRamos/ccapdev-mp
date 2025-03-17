@@ -20,10 +20,10 @@ export default function EditProfile() {
         profilePic:
           user.profilePicture ||
           "https://cdn-icons-png.flaticon.com/512/147/147285.png",
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        bio: user.bio,
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        email: user.email || "",
+        bio: user.bio || "",
       });
     }
   }, []);
@@ -36,32 +36,50 @@ export default function EditProfile() {
     }));
   };
 
-  const handleProfilePicChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileDetails((prev) => ({
-          ...prev,
-          profilePic: reader.result,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // const handleProfilePicChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setProfileDetails((prev) => ({
+  //         ...prev,
+  //         profilePic: reader.result,
+  //       }));
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Retrieve user data from local storage
       const userData = JSON.parse(localStorage.getItem("userData"));
-      const response = await axios.put("http://localhost:5500/api/profile", {
+      if (!userData) {
+        alert("User data not found. Please log in again.");
+        return;
+      }
+
+      // Prepare the request payload
+      const payload = {
         userId: userData._id,
         profilePic: profileDetails.profilePic,
         firstName: profileDetails.firstName,
         lastName: profileDetails.lastName,
         email: profileDetails.email,
         bio: profileDetails.bio,
-      });
+      };
+
+      // Send the PUT request to update the profile
+      const response = await axios.put(
+        `http://localhost:5500/api/users/${userData._id}`, // Include the user ID in the URL
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
 
       if (response.status === 200) {
         // Update local storage with the new user data
@@ -72,7 +90,11 @@ export default function EditProfile() {
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("An error occurred while updating the profile.");
+      if (error.response && error.response.data && error.response.data.message) {
+        alert(error.response.data.message); // Show specific error message from the server
+      } else {
+        alert("An error occurred while updating the profile.");
+      }
     }
   };
 
@@ -89,7 +111,7 @@ export default function EditProfile() {
           <input
             type="file"
             accept="image/*"
-            onChange={handleProfilePicChange}
+            // onChange={handleProfilePicChange}
           />
         </div>
         <div className="form-group">

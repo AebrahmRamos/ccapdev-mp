@@ -31,12 +31,12 @@ export default function CafeListing() {
       setLoading(true);
       setError(null); // Clear any previous errors
       try {
-        const response = await fetch("http://localhost:5500/api/cafes"); // Fetch from your API endpoint
+        const response = await fetch("http://localhost:5500/api/cafes");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        setCafes(data.cafes); // Assuming the API returns { cafes: [...] }
+        setCafes(data); // Assuming the API returns { cafes: [...] }
       } catch (e) {
         console.error("Failed to fetch cafes:", e);
         setError(e);
