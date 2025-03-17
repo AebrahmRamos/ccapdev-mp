@@ -272,7 +272,7 @@ app.delete("/api/users/:id", authenticateToken, async (req, res) => {
 });
 
 // CRUD Cafe Endpoints
-//endpoint to fetch cafe data based on the ownerId
+
 app.get("/api/cafe", authenticateToken, async (req, res) => {
   const ownerId = req.user.userId;
 
@@ -285,6 +285,17 @@ app.get("/api/cafe", authenticateToken, async (req, res) => {
     res.status(200).json({ cafe });
   } catch (error) {
     console.error("Error fetching cafe data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Endpoint to fetch all cafes
+app.get("/api/cafes", async (req, res) => {
+  try {
+    const cafes = await Cafe.find();
+    res.status(200).json(cafes);
+  } catch (error) {
+    console.error("Error fetching cafes:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -311,7 +322,9 @@ app.put("/api/cafes/:slug", authenticateToken, async (req, res) => {
   try {
     const cafe = await Cafe.findOne({ slug, ownerId: req.user.userId });
     if (!cafe) {
-      return res.status(404).json({ message: "Cafe not found or unauthorized" });
+      return res
+        .status(404)
+        .json({ message: "Cafe not found or unauthorized" });
     }
 
     if (cafeName) {

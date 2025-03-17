@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -12,6 +12,7 @@ import Container from "./Container";
 
 const TrendingCafes = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [trendingCafes, setTrendingCafes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,7 +33,7 @@ const TrendingCafes = () => {
             trendingScore: cafe.totalReviews * cafe.averageReview,
           }))
           .sort((a, b) => b.trendingScore - a.trendingScore)
-          .slice(0, 3); // Take top 3
+          .slice(0, 6); // Take top 3
 
         setTrendingCafes(processed);
       } catch (error) {
@@ -58,6 +59,14 @@ const TrendingCafes = () => {
         flexDirection={{ xs: "column", sm: "row" }}
         marginBottom={3}
       >
+        <Box textAlign={{ xs: "left", sm: "left" }}>
+          <Typography fontWeight={700} variant={"h6"} gutterBottom>
+            Popular Cafes
+          </Typography>
+          <Typography color={"text.secondary"}>
+            Most reviewed and highest rated cafes
+          </Typography>
+        </Box>
         <Box display="flex" marginTop={{ xs: 2, md: 0 }}>
           <Box
             component={Button}
@@ -74,17 +83,10 @@ const TrendingCafes = () => {
                 color: "black",
               },
             }}
+            onClick={() => navigate("/cafe")} // Navigate to /cafe on click
           >
             View all
           </Box>
-        </Box>
-        <Box textAlign={{ xs: "left", sm: "right" }}>
-          <Typography fontWeight={700} variant={"h6"} gutterBottom>
-            Popular Cafes
-          </Typography>
-          <Typography color={"text.secondary"}>
-            Most reviewed and highest rated cafes
-          </Typography>
         </Box>
       </Box>
       <Grid container spacing={4}>
@@ -139,23 +141,11 @@ const TrendingCafes = () => {
                   </Box>
                 </Box>
                 <Box flexGrow={1} />
-                <Box padding={2} display={"flex"} flexDirection={"column"}>
-                  <Box marginBottom={2}>
-                    <Divider />
-                  </Box>
-                  <Box
-                    display={"flex"}
-                    justifyContent={"space-between"}
-                    alignItems={"center"}
-                  >
-                    <Typography color={"text.secondary"}>
-                      {cafe.category}
-                    </Typography>
-                    <Typography color={"text.secondary"}>
-                      {cafe.operatingHours.Monday}
-                    </Typography>
-                  </Box>
-                </Box>
+                <Box
+                  padding={2}
+                  display={"flex"}
+                  flexDirection={"column"}  
+                ></Box>
               </Box>
             </Box>
           </Grid>
