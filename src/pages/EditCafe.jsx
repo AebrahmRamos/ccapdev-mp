@@ -24,9 +24,10 @@ export default function EditCafe() {
     // Retrieve cafe data from the backend
     const fetchCafeData = async () => {
       try {
-        const userData = JSON.parse(localStorage.getItem("userData"));
         const response = await axios.get("http://localhost:5500/api/cafe", {
-          params: { email: userData.email },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
         });
 
         const { cafe } = response.data;
@@ -36,6 +37,7 @@ export default function EditCafe() {
           address: cafe.address,
           operatingHours: cafe.operatingHours,
           photos: cafe.photos,
+          slug: cafe.slug,
         });
       } catch (error) {
         console.error("Error fetching cafe data:", error);
@@ -66,27 +68,39 @@ export default function EditCafe() {
 
   const handlePhotosChange = (e) => {
     const files = Array.from(e.target.files);
-    const reader = new FileReader();
-    reader.onloadend = () => {
+    const readers = files.map((file) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      return new Promise((resolve) => {
+        reader.onloadend = () => resolve(reader.result);
+      });
+    });
+
+    Promise.all(readers).then((photos) => {
       setCafeDetails((prev) => ({
         ...prev,
-        photos: [...prev.photos, reader.result],
+        photos: [...prev.photos, ...photos],
       }));
-    };
-    files.forEach((file) => reader.readAsDataURL(file));
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const userData = JSON.parse(localStorage.getItem("userData"));
-      const response = await axios.put("http://localhost:5500/api/cafe", {
-        email: userData.email,
-        cafeName: cafeDetails.name,
-        address: cafeDetails.address,
-        operatingHours: cafeDetails.operatingHours,
-        photos: cafeDetails.photos,
-      });
+      const response = await axios.put(
+        `http://localhost:5500/api/cafes/${cafeDetails.slug}`,
+        {
+          cafeName: cafeDetails.name,
+          address: cafeDetails.address,
+          operatingHours: cafeDetails.operatingHours,
+          photos: cafeDetails.photos,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
 
       if (response.status === 200) {
         alert("Cafe updated successfully!");

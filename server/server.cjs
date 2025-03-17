@@ -53,7 +53,10 @@ const authenticateToken = (req, res, next) => {
 
 // Helper function to generate a unique slug
 const generateSlug = (name) => {
-  return name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
+  return name
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "");
 };
 
 // Login Endpoint
@@ -75,7 +78,9 @@ app.post("/api/login", async (req, res) => {
 
     // Return token and user data (excluding password)
     const userData = { ...user.toObject(), password: undefined };
-    res.status(200).json({ message: "Login successful", token, user: userData });
+    res
+      .status(200)
+      .json({ message: "Login successful", token, user: userData });
   } catch (error) {
     console.error("Error during login", error);
     res.status(500).json({ message: "Internal server error" });
@@ -119,7 +124,9 @@ app.post(
       });
 
       await newUser.save();
-      res.status(201).json({ message: "Student signup successful", user: newUser });
+      res
+        .status(201)
+        .json({ message: "Student signup successful", user: newUser });
     } catch (error) {
       console.error("Error during student signup:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -144,7 +151,16 @@ app.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { firstName, lastName, email, password, cafeName, address, category, operatingHours } = req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      cafeName,
+      address,
+      category,
+      operatingHours,
+    } = req.body;
 
     try {
       // Check if user already exists
@@ -190,7 +206,11 @@ app.post(
       });
 
       await newCafe.save();
-      res.status(201).json({ message: "Cafe owner signup successful", user: newUser, cafe: newCafe });
+      res.status(201).json({
+        message: "Cafe owner signup successful",
+        user: newUser,
+        cafe: newCafe,
+      });
     } catch (error) {
       console.error("Error during cafe owner signup:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -227,7 +247,9 @@ app.put("/api/users/:id", authenticateToken, async (req, res) => {
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).json({ message: "User updated successfully", user: updatedUser });
+    res
+      .status(200)
+      .json({ message: "User updated successfully", user: updatedUser });
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -250,12 +272,19 @@ app.delete("/api/users/:id", authenticateToken, async (req, res) => {
 });
 
 // CRUD Cafe Endpoints
-app.get("/api/cafes", async (req, res) => {
+//endpoint to fetch cafe data based on the ownerId
+app.get("/api/cafe", authenticateToken, async (req, res) => {
+  const ownerId = req.user.userId;
+
   try {
-    const cafes = await Cafe.find();
-    res.status(200).json(cafes);
+    const cafe = await Cafe.findOne({ ownerId });
+    if (!cafe) {
+      return res.status(404).json({ message: "Cafe not found" });
+    }
+
+    res.status(200).json({ cafe });
   } catch (error) {
-    console.error("Error fetching cafes:", error);
+    console.error("Error fetching cafe data:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -306,9 +335,14 @@ app.delete("/api/cafes/:slug", authenticateToken, async (req, res) => {
   const slug = req.params.slug;
 
   try {
-    const cafe = await Cafe.findOneAndDelete({ slug, ownerId: req.user.userId });
+    const cafe = await Cafe.findOneAndDelete({
+      slug,
+      ownerId: req.user.userId,
+    });
     if (!cafe) {
-      return res.status(404).json({ message: "Cafe not found or unauthorized" });
+      return res
+        .status(404)
+        .json({ message: "Cafe not found or unauthorized" });
     }
     res.status(200).json({ message: "Cafe deleted successfully" });
   } catch (error) {
@@ -324,7 +358,14 @@ app.post("/api/reviews", authenticateToken, async (req, res) => {
 
   try {
     // Validate rating fields
-    const requiredRatingFields = ["ambiance", "drinkQuality", "service", "wifiReliability", "cleanliness", "valueForMoney"];
+    const requiredRatingFields = [
+      "ambiance",
+      "drinkQuality",
+      "service",
+      "wifiReliability",
+      "cleanliness",
+      "valueForMoney",
+    ];
     for (const field of requiredRatingFields) {
       if (!rating[field] || rating[field] < 1 || rating[field] > 5) {
         return res.status(400).json({ message: `Invalid rating for ${field}` });
@@ -333,7 +374,9 @@ app.post("/api/reviews", authenticateToken, async (req, res) => {
 
     // Validate textReview length
     if (textReview.length < 10 || textReview.length > 1000) {
-      return res.status(400).json({ message: "Text review must be between 10 and 1000 characters" });
+      return res.status(400).json({
+        message: "Text review must be between 10 and 1000 characters",
+      });
     }
 
     const newReview = new Review({
@@ -346,7 +389,9 @@ app.post("/api/reviews", authenticateToken, async (req, res) => {
     });
 
     await newReview.save();
-    res.status(201).json({ message: "Review submitted successfully", review: newReview });
+    res
+      .status(201)
+      .json({ message: "Review submitted successfully", review: newReview });
   } catch (error) {
     console.error("Error submitting review:", error);
     res.status(500).json({ message: "Internal server error" });

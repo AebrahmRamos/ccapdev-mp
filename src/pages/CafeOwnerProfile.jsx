@@ -2,6 +2,7 @@ import "../styles/Profile.css";
 import "../styles/CafeOwnerProfile.css";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function CafeOwnerProfile() {
   const navigate = useNavigate();
@@ -41,15 +42,31 @@ export default function CafeOwnerProfile() {
           "https://t3.ftcdn.net/jpg/01/94/82/86/360_F_194828624_llDpKzFNYmi6cfHVF8GOOoAe5KTJlc9N.jpg",
       });
 
-      // Assuming cafe data is also stored in user data
-      setCafeData({
-        name: user.cafeName || "My Cafe",
-        address: user.cafeAddress || "Cafe Address",
-        rating: user.cafeRating || 0,
-        logo: user.cafeLogo || "/images/default-cafe-logo.png",
-        openingHours: user.cafeOpeningHours || {},
-        photos: user.cafePhotos || [],
-      });
+      // Fetch cafe data from the backend using the ownerId
+      const fetchCafeData = async () => {
+        try {
+          const response = await axios.get("http://localhost:5500/api/cafe", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          });
+
+          const { cafe } = response.data;
+
+          setCafeData({
+            name: cafe.cafeName,
+            address: cafe.address,
+            rating: cafe.averageReview || 0,
+            logo: cafe.logo || "/images/default-cafe-logo.png",
+            openingHours: cafe.operatingHours,
+            photos: cafe.photos,
+          });
+        } catch (error) {
+          console.error("Error fetching cafe data:", error);
+        }
+      };
+
+      fetchCafeData();
     }
   }, []);
 
