@@ -1,5 +1,7 @@
+import { useState } from "react";
 import PropTypes from "prop-types";
 import styles from "../styles/CafeDetails.module.css";
+import { EditReviewForm } from "./EditReviewForm";
 
 export function ReviewCard({
   date,
@@ -8,9 +10,29 @@ export function ReviewCard({
   rating,
   photos,
   videos,
+  isProfilePage,
+  onEdit,
+  onDelete,
+  reviewId
 }) {
+  const [isEditing, setIsEditing] = useState(false);
 
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
 
+  const handleSave = async (updatedReview) => {
+    try {
+      await onEdit(reviewId, updatedReview);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating review:', error);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+  };
   return (
     <div className={styles.reviewCard}>
       <div className={styles.reviewHeader}>
@@ -23,6 +45,22 @@ export function ReviewCard({
             <div className={styles.reviewerMeta}>
               <span></span>
               <span>{new Date(date).toLocaleDateString()}</span>
+              {isProfilePage && onEdit && onDelete && reviewId && (
+                <div className={styles.reviewActions}>
+                  <button
+                    onClick={handleEdit}
+                    className={styles.editButton}
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    onClick={() => onDelete(reviewId)}
+                    className={styles.deleteButton}
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+              )}
             </div>
             {/* <div className={styles.ratingDisplay}>
               <img
@@ -56,7 +94,15 @@ export function ReviewCard({
         </div>
       </div>
 
-      <p className={styles.reviewText}>{textReview}</p>
+      {isEditing ? (
+        <EditReviewForm
+          review={{ textReview, rating }}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
+      ) : (
+        <p className={styles.reviewText}>{textReview}</p>
+      )}
       {(photos.length > 0 || videos.length > 0) && (
         <div className={styles.reviewMedia}>
           {photos.map((photo, index) => (
@@ -89,4 +135,8 @@ ReviewCard.propTypes = {
   rating: PropTypes.object.isRequired,
   photos: PropTypes.array.isRequired,
   videos: PropTypes.array.isRequired,
+  isProfilePage: PropTypes.bool,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+  reviewId: PropTypes.string
 };
