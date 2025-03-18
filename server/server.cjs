@@ -410,12 +410,50 @@ app.post("/api/reviews", authenticateToken, async (req, res) => {
 
     const updatedTotalReviews = (cafe.totalReviews || 0) + 1;
 
+    const existingReviews = await Review.find({ cafeId });
+
+    // Calculate the average rating for the new review
+    const newReviewAverageRating =
+      (rating.ambiance +
+        rating.drinkQuality +
+        rating.service +
+        rating.wifiReliability +
+        rating.cleanliness +
+        rating.valueForMoney) /
+      6;
+
+    let newTotalAverageRating;
+
+    if (existingReviews.length === 0) {
+      // If there are no existing reviews, the new total average rating is the new review's average rating
+      newTotalAverageRating = newReviewAverageRating;
+    } else {
+      // Calculate the sum of average ratings of all existing reviews
+      const totalAverageRatings = existingReviews.reduce((acc, review) => {
+        const reviewAverageRating =
+          (review.rating.ambiance +
+            review.rating.drinkQuality +
+            review.rating.service +
+            review.rating.wifiReliability +
+            review.rating.cleanliness +
+            review.rating.valueForMoney) /
+          6;
+        return acc + reviewAverageRating;
+      }, 0);
+
+      // Calculate the new total average rating
+      newTotalAverageRating = totalAverageRatings / updatedTotalReviews;
+    }
+
+    newTotalAverageRating = parseFloat(newTotalAverageRating.toFixed(1));
+
     // Update the cafe's total reviews and average ratings
     await Cafe.updateOne(
       { _id: cafeId },
       {
         $set: {
           totalReviews: updatedTotalReviews,
+          averageReview: newTotalAverageRating,
         },
       }
     );
@@ -424,6 +462,7 @@ app.post("/api/reviews", authenticateToken, async (req, res) => {
       message: "Review submitted successfully",
       review: newReview,
       reviewsCount: updatedTotalReviews,
+      totalAverageRating: newTotalAverageRating,
     });
   } catch (error) {
     console.error("Error submitting review:", error);
