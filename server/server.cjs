@@ -495,57 +495,6 @@ app.get("/api/reviews/user/:userId", authenticateToken, async (req, res) => {
   }
 });
 
-app.put("/api/reviews/:id", authenticateToken, async (req, res) => {
-  const reviewId = req.params.id;
-  const { rating, textReview } = req.body;
-
-  try {
-    // Validate rating fields
-    if (rating) {
-      const requiredRatingFields = [
-        "ambiance",
-        "drinkQuality",
-        "service",
-        "wifiReliability",
-        "cleanliness",
-        "valueForMoney",
-      ];
-      for (const field of requiredRatingFields) {
-        if (!rating[field] || rating[field] < 1 || rating[field] > 5) {
-          return res.status(400).json({ message: `Invalid rating for ${field}` });
-        }
-      }
-    }
-
-    // Validate textReview length if provided
-    if (textReview && (textReview.length < 10 || textReview.length > 1000)) {
-      return res.status(400).json({
-        message: "Text review must be between 10 and 1000 characters",
-      });
-    }
-
-    const review = await Review.findById(reviewId);
-    if (!review) {
-      return res.status(404).json({ message: "Review not found" });
-    }
-
-    // Check if the user owns this review
-    if (review.userId.toString() !== req.user.userId) {
-      return res.status(403).json({ message: "Not authorized to edit this review" });
-    }
-
-    // Update the review
-    if (rating) review.rating = rating;
-    if (textReview) review.textReview = textReview;
-
-    await review.save();
-    res.status(200).json({ message: "Review updated successfully", review });
-  } catch (error) {
-    console.error("Error updating review:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 // Update a review
 app.put("/api/reviews/:id", authenticateToken, async (req, res) => {
   const reviewId = req.params.id;
@@ -557,11 +506,47 @@ app.put("/api/reviews/:id", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Review not found" });
     }
 
+    // Check if the user owns this review
+    if (review.userId.toString() !== req.user.userId) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to edit this review" });
+    }
+
     // Update review fields
-    review.textReview = textReview;
-    review.rating = rating;
+    if (textReview) review.textReview = textReview;
+    if (rating) review.rating = rating;
 
     await review.save();
+
+    // Update the cafe's ratings
+    const cafeId = review.cafeId;
+    const reviews = await Review.find({ cafeId });
+    const totalReviews = reviews.length;
+
+    const totalAverageRating =
+      reviews.reduce((acc, review) => {
+        const reviewAverageRating =
+          (review.rating.ambiance +
+            review.rating.drinkQuality +
+            review.rating.service +
+            review.rating.wifiReliability +
+            review.rating.cleanliness +
+            review.rating.valueForMoney) /
+          6;
+        return acc + reviewAverageRating;
+      }, 0) / totalReviews;
+
+    await Cafe.updateOne(
+      { _id: cafeId },
+      {
+        $set: {
+          totalReviews,
+          averageReview: parseFloat(totalAverageRating.toFixed(1)),
+        },
+      }
+    );
+
     res.status(200).json({ message: "Review updated successfully", review });
   } catch (error) {
     console.error("Error updating review:", error);
@@ -577,6 +562,39 @@ app.delete("/api/reviews/:id", authenticateToken, async (req, res) => {
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
+
+    // Update the cafe's ratings
+    const cafeId = review.cafeId;
+    const reviews = await Review.find({ cafeId });
+    const totalReviews = reviews.length;
+
+    let totalAverageRating = 0;
+
+    if (totalReviews > 0) {
+      totalAverageRating =
+        reviews.reduce((acc, review) => {
+          const reviewAverageRating =
+            (review.rating.ambiance +
+              review.rating.drinkQuality +
+              review.rating.service +
+              review.rating.wifiReliability +
+              review.rating.cleanliness +
+              review.rating.valueForMoney) /
+            6;
+          return acc + reviewAverageRating;
+        }, 0) / totalReviews;
+    }
+
+    await Cafe.updateOne(
+      { _id: cafeId },
+      {
+        $set: {
+          totalReviews,
+          averageReview: parseFloat(totalAverageRating.toFixed(1)),
+        },
+      }
+    );
+
     res.status(200).json({ message: "Review deleted successfully" });
   } catch (error) {
     console.error("Error deleting review:", error);

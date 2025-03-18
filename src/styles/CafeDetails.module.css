@@ -293,7 +293,7 @@
 }
 
 .editButton {
-  background-color: #6B7050;
+  background-color: #6b7050;
   color: white;
 }
 
@@ -307,7 +307,7 @@
 }
 
 .deleteButton:hover {
-  background-color: #A66B6B;
+  background-color: #a66b6b;
 }
 
 .editReviewForm {
@@ -332,12 +332,12 @@
 
 .ratingInputs label {
   font-weight: 500;
-  color: #3E2F28;
+  color: #3e2f28;
 }
 
 .ratingInputs input {
   padding: 8px;
-  border: 1px solid #C8B89F;
+  border: 1px solid #c8b89f;
   border-radius: 4px;
   background: white;
 }
@@ -350,13 +350,13 @@
   display: block;
   margin-bottom: 5px;
   font-weight: 500;
-  color: #3E2F28;
+  color: #3e2f28;
 }
 
 .reviewTextArea textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid #C8B89F;
+  border: 1px solid #c8b89f;
   border-radius: 4px;
   background: white;
   resize: vertical;
@@ -369,7 +369,7 @@
 }
 
 .saveButton {
-  background-color: #6B7050;
+  background-color: #6b7050;
   color: white;
   padding: 8px 16px;
   border: none;
@@ -383,7 +383,7 @@
 }
 
 .cancelButton {
-  background-color: #C8B89F;
+  background-color: #c8b89f;
   color: white;
   padding: 8px 16px;
   border: none;
@@ -393,7 +393,7 @@
 }
 
 .cancelButton:hover {
-  background-color: #B3A48C;
+  background-color: #b3a48c;
 }
 
 .modalOverlay {

@@ -73,6 +73,33 @@ export default function Profile() {
     navigate("/login");
   };
 
+  const updateCafeRatings = async (cafeId, isDelete = false) => {
+    const reviews = await api.get(`/api/reviews/cafe/${cafeId}`);
+    let totalReviews = reviews.data.length;
+
+    if (isDelete) {
+      totalReviews -= 1;
+    }
+
+    const totalAverageRating =
+      reviews.data.reduce((acc, review) => {
+        const reviewAverageRating =
+          (review.rating.ambiance +
+            review.rating.drinkQuality +
+            review.rating.service +
+            review.rating.wifiReliability +
+            review.rating.cleanliness +
+            review.rating.valueForMoney) /
+          6;
+        return acc + reviewAverageRating;
+      }, 0) / totalReviews;
+
+    await api.put(`/api/cafes/${cafeId}`, {
+      totalReviews,
+      totalAverageRating: parseFloat(totalAverageRating.toFixed(1)),
+    });
+  };
+
   const handleEditReview = async (reviewId, updatedReview) => {
     try {
       console.log("Sending update for review:", reviewId, updatedReview);
@@ -94,6 +121,9 @@ export default function Profile() {
             : review
         )
       );
+
+      // Update the cafe's ratings
+      await updateCafeRatings(updatedReview.cafeId);
     } catch (error) {
       console.error("Error editing review:", error);
     }
@@ -102,11 +132,17 @@ export default function Profile() {
   const handleDeleteReview = async (reviewId) => {
     if (window.confirm("Are you sure you want to delete this review?")) {
       try {
+        const reviewToDelete = userReviews.find(
+          (review) => review._id === reviewId
+        );
         await api.delete(`/api/reviews/${reviewId}`);
         // Update the reviews list by filtering out the deleted review
         setUserReviews((prevReviews) =>
           prevReviews.filter((review) => review._id !== reviewId)
         );
+
+        // Update the cafe's ratings
+        await updateCafeRatings(reviewToDelete.cafeId, true);
       } catch (error) {
         console.error("Error deleting review:", error);
       }
