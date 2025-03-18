@@ -13,7 +13,7 @@ export function ReviewCard({
   isProfilePage,
   onEdit,
   onDelete,
-  reviewId
+  reviewId,
 }) {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -26,7 +26,7 @@ export function ReviewCard({
       await onEdit(reviewId, updatedReview);
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating review:', error);
+      console.error("Error updating review:", error);
     }
   };
 
@@ -36,21 +36,17 @@ export function ReviewCard({
   return (
     <div className={styles.reviewCard}>
       <div className={styles.reviewHeader}>
-        <img
-          src={profileImage}
-          className={styles.reviewerImage}
-        />
-        <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <img src={profileImage} className={styles.reviewerImage} />
+        <div
+          style={{ display: "flex", flexDirection: "column", width: "100%" }}
+        >
           <div className={styles.reviewerInfo}>
             <div className={styles.reviewerMeta}>
               <span></span>
               <span>{new Date(date).toLocaleDateString()}</span>
               {isProfilePage && onEdit && onDelete && reviewId && (
                 <div className={styles.reviewActions}>
-                  <button
-                    onClick={handleEdit}
-                    className={styles.editButton}
-                  >
+                  <button onClick={handleEdit} className={styles.editButton}>
                     ✏️ Edit
                   </button>
                   <button
@@ -121,9 +117,6 @@ export function ReviewCard({
           ))}
         </div>
       )}
-      <button className={styles.helpfulButton} tabIndex={0}>
-        Was this review helpful? 👍🏻
-      </button>
     </div>
   );
 }
@@ -138,5 +131,5 @@ ReviewCard.propTypes = {
   isProfilePage: PropTypes.bool,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
-  reviewId: PropTypes.string
+  reviewId: PropTypes.string,
 };

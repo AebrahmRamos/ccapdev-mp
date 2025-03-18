@@ -602,6 +602,39 @@ app.delete("/api/reviews/:id", authenticateToken, async (req, res) => {
   }
 });
 
+app.put("/api/reviews/:id/helpful", authenticateToken, async (req, res) => {
+  const reviewId = req.params.id;
+  const userId = req.user.userId;
+
+  try {
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    const userIndex = review.helpfulVoters.indexOf(userId);
+    if (userIndex === -1) {
+      // User has not upvoted yet, add their vote
+      review.helpfulVotes += 1;
+      review.helpfulVoters.push(userId);
+    } else {
+      // User has already upvoted, remove their vote
+      review.helpfulVotes -= 1;
+      review.helpfulVoters.splice(userIndex, 1);
+    }
+
+    await review.save();
+
+    res.status(200).json({
+      message: "Helpful vote toggled",
+      helpfulVotes: review.helpfulVotes,
+    });
+  } catch (error) {
+    console.error("Error updating helpful votes:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
