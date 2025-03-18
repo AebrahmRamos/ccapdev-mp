@@ -232,7 +232,7 @@ const ReviewSubmission = () => {
             <label htmlFor="reviewText">Your Review</label>
             <textarea
               id="reviewText"
-              placeholder="Write your detailed review here (minimum 20 characters)..."
+              placeholder="Write your review here (minimum 20 characters)..."
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
               required
@@ -240,7 +240,7 @@ const ReviewSubmission = () => {
             />
             <div className="character-count">
               Characters: {reviewText.length}{" "}
-              {reviewText.length < 20 && "(minimum 20 required)"}
+              {reviewText.length < 20 && "(Min: 20)"}
             </div>
           </div>
 
