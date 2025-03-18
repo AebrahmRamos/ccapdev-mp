@@ -90,7 +90,9 @@ function ReviewCard({
             e.target.src = "/images/default-profile.png";
           }}
         />
-        <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <div
+          style={{ display: "flex", flexDirection: "column", width: "100%" }}
+        >
           <div className={styles.reviewerInfo}>
             <div className={styles.reviewerMeta}>
               <span>{name}</span>
@@ -100,7 +102,7 @@ function ReviewCard({
           <div className={styles.amenityDetails}>
             {Object.entries(rating).map(([key, value]) => (
               <div key={key}>
-                <strong>{key}:</strong> {value?.toFixed(1) || "N/A"}
+                <strong>{key}:</strong> {value?.toFixed(0) || "N/A"}
               </div>
             ))}
           </div>
