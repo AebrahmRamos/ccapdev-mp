@@ -7,7 +7,7 @@ export function CafeDetails({
   averageReview,
   address,
   operatingHours,
-  mainImage
+  mainImage,
 }) {
   return (
     <div className={styles.headerContainer}>
@@ -66,5 +66,5 @@ CafeDetails.propTypes = {
   averageReview: PropTypes.number.isRequired,
   address: PropTypes.string.isRequired,
   operatingHours: PropTypes.object.isRequired,
-  mainImage: PropTypes.string.isRequired
+  mainImage: PropTypes.string.isRequired,
 };

@@ -10,17 +10,22 @@ const getImageUrl = (image) => {
 };
 
 function ReviewCard({
+  reviewId,
   date,
   userId,
   textReview,
   rating,
   photos = [],
   videos = [],
+  helpfulVotes: initialHelpfulVotes,
+  currentUserId,
 }) {
   const [profileImage, setProfileImage] = useState(null);
   const [name, setName] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [helpfulVotes, setHelpfulVotes] = useState(initialHelpfulVotes);
+  const [hasUpvoted, setHasUpvoted] = useState(false);
 
   useEffect(() => {
     const fetchUserProfileImage = async () => {
@@ -43,6 +48,33 @@ function ReviewCard({
     fetchUserProfileImage();
   }, [userId]);
 
+  useEffect(() => {
+    const checkIfUserHasUpvoted = async () => {
+      try {
+        const response = await api.get(`/api/reviews/${reviewId}`);
+        if (response.status !== 200) {
+          throw new Error("Failed to fetch review data");
+        }
+        const reviewData = response.data;
+        setHasUpvoted(reviewData.helpfulVoters.includes(currentUserId));
+      } catch (error) {
+        console.error("Error checking if user has upvoted:", error);
+      }
+    };
+
+    checkIfUserHasUpvoted();
+  }, [reviewId, currentUserId]);
+
+  const handleHelpfulClick = async () => {
+    try {
+      const response = await api.put(`/api/reviews/${reviewId}/helpful`);
+      setHelpfulVotes(response.data.helpfulVotes);
+      setHasUpvoted(!hasUpvoted);
+    } catch (error) {
+      console.error("Error updating helpful votes:", error);
+    }
+  };
+
   if (loading) return <div>Loading review...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -50,7 +82,7 @@ function ReviewCard({
     <div className={styles.reviewCard}>
       <div className={styles.reviewHeader}>
         <img
-          src={profileImage}
+          src={profileImage || "/default-profile-image.png"}
           alt={`${name}'s profile`}
           className={styles.reviewerImage}
           onError={(e) => {
@@ -98,20 +130,42 @@ function ReviewCard({
           ))}
         </div>
       )}
-      <button className={styles.helpfulButton} tabIndex={0}>
-        Was this review helpful? 👍🏻
-      </button>
+      <div className={styles.reviewActions}>
+        <span className={styles.helpfulText}>
+          {helpfulVotes} found this helpful
+        </span>
+        <button
+          onClick={handleHelpfulClick}
+          className={styles.helpfulButton}
+          tabIndex={0}
+        >
+          {hasUpvoted
+            ? "Remove helpful vote 👎🏻"
+            : "Was this review helpful? 👍🏻"}
+        </button>
+      </div>
     </div>
   );
 }
 
-function ReviewsSection({ reviews = [] }) {
+function ReviewsSection({ reviews = [], currentUserId }) {
   return (
     <div className={styles.reviewsSection}>
       <h2 className={styles.reviewsTitle}>Reviews</h2>
       <div className={styles.reviewsList}>
-        {reviews.map((review, index) => (
-          <ReviewCard key={index} {...review} userId={review.userId} />
+        {reviews.map((review) => (
+          <ReviewCard
+            key={review._id}
+            reviewId={review._id}
+            date={review.date}
+            userId={review.userId}
+            textReview={review.textReview}
+            rating={review.rating}
+            photos={review.photos || []}
+            videos={review.videos || []}
+            helpfulVotes={review.helpfulVotes || 0}
+            currentUserId={currentUserId}
+          />
         ))}
       </div>
     </div>
@@ -121,6 +175,7 @@ function ReviewsSection({ reviews = [] }) {
 export default ReviewsSection;
 
 ReviewCard.propTypes = {
+  reviewId: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   userId: PropTypes.string.isRequired,
   textReview: PropTypes.string.isRequired,
@@ -134,24 +189,29 @@ ReviewCard.propTypes = {
   }).isRequired,
   photos: PropTypes.arrayOf(PropTypes.string),
   videos: PropTypes.arrayOf(PropTypes.string),
+  helpfulVotes: PropTypes.number.isRequired,
+  currentUserId: PropTypes.string.isRequired,
 };
 
 ReviewsSection.propTypes = {
   reviews: PropTypes.arrayOf(
     PropTypes.shape({
+      _id: PropTypes.string.isRequired,
       date: PropTypes.string.isRequired,
       userId: PropTypes.string.isRequired,
       textReview: PropTypes.string.isRequired,
       rating: PropTypes.shape({
-        ambiance: PropTypes.number,
-        drinkQuality: PropTypes.number,
-        service: PropTypes.number,
-        wifiReliability: PropTypes.number,
-        cleanliness: PropTypes.number,
-        valueForMoney: PropTypes.number,
+        ambiance: PropTypes.number.isRequired,
+        drinkQuality: PropTypes.number.isRequired,
+        service: PropTypes.number.isRequired,
+        wifiReliability: PropTypes.number.isRequired,
+        cleanliness: PropTypes.number.isRequired,
+        valueForMoney: PropTypes.number.isRequired,
       }).isRequired,
       photos: PropTypes.arrayOf(PropTypes.string),
       videos: PropTypes.arrayOf(PropTypes.string),
+      helpfulVotes: PropTypes.number.isRequired,
     })
   ),
+  currentUserId: PropTypes.string.isRequired,
 };
