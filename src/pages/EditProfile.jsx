@@ -36,65 +36,89 @@ export default function EditProfile() {
     }));
   };
 
-  // const handleProfilePicChange = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setProfileDetails((prev) => ({
-  //         ...prev,
-  //         profilePic: reader.result,
-  //       }));
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
+  const handleProfilePicChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileDetails((prev) => ({
+          ...prev,
+          profilePic: reader.result, // Temporarily store as data URL
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Retrieve user data from local storage
       const userData = JSON.parse(localStorage.getItem("userData"));
       if (!userData) {
         alert("User data not found. Please log in again.");
         return;
       }
-
-      // Prepare the request payload
-      const payload = {
-        userId: userData._id,
-        profilePic: profileDetails.profilePic,
-        firstName: profileDetails.firstName,
-        lastName: profileDetails.lastName,
-        email: profileDetails.email,
-        bio: profileDetails.bio,
-      };
-
-      // Send the PUT request to update the profile
+  
+      let profilePicture = profileDetails.profilePic;
+  
+      // Handle image upload if new image was selected
+      if (profilePicture.startsWith("data:image")) {
+        const matches = profilePicture.match(/^data:(.+);base64,(.+)$/);
+        const imageType = matches[1];
+        const base64Data = matches[2];
+  
+        // Upload image
+        const uploadResponse = await axios.post(
+          "http://localhost:5500/api/upload",
+          {
+            image: {
+              name: `profile-${Date.now()}`,
+              type: imageType,
+              data: base64Data,
+            },
+          }
+        );
+  
+        if (uploadResponse.data.success) {
+          profilePicture = uploadResponse.data.imageId;
+        } else {
+          throw new Error("Failed to upload image");
+        }
+      }
+  
+      // Update user data
       const response = await axios.put(
-        `http://localhost:5500/api/users/${userData._id}`, // Include the user ID in the URL
-        payload,
+        `http://localhost:5500/api/users/${userData._id}`,
+        {
+          firstName: profileDetails.firstName,
+          lastName: profileDetails.lastName,
+          email: profileDetails.email,
+          profilePicture,
+          bio: profileDetails.bio,
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         }
       );
-
+  
       if (response.status === 200) {
-        // Update local storage with the new user data
-        localStorage.setItem("userData", JSON.stringify(response.data.user));
+        // Update local storage with new data
+        const updatedUser = response.data.user;
+        localStorage.setItem("userData", JSON.stringify(updatedUser));
+        
+        // Update local state with new image URL if needed
+        setProfileDetails(prev => ({
+          ...prev,
+          profilePic: updatedUser.profilePicture,
+        }));
+  
         alert("Profile updated successfully!");
-      } else {
-        alert("Failed to update profile.");
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      if (error.response && error.response.data && error.response.data.message) {
-        alert(error.response.data.message); // Show specific error message from the server
-      } else {
-        alert("An error occurred while updating the profile.");
-      }
+      alert(error.response?.data?.message || "An error occurred.");
     }
   };
 
@@ -111,7 +135,7 @@ export default function EditProfile() {
           <input
             type="file"
             accept="image/*"
-            // onChange={handleProfilePicChange}
+            onChange={handleProfilePicChange}
           />
         </div>
         <div className="form-group">

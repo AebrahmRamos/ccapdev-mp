@@ -12,6 +12,7 @@ require("dotenv").config({ path: path.join(__dirname, "config.env") });
 const Review = require("./Models/Review.cjs");
 const Cafe = require("./Models/Cafe.cjs");
 const User = require("./Models/Users.cjs");
+const Image = require("./Models/Image.cjs");
 
 // Initialize Express app
 const app = express();
@@ -364,6 +365,16 @@ app.delete("/api/cafes/:slug", authenticateToken, async (req, res) => {
   }
 });
 
+app.get("/api/cafes/owner/:ownerId", authenticateToken, async (req, res) => {
+  try {
+    const cafe = await Cafe.findOne({ ownerId: req.params.ownerId });
+    if (!cafe) return res.status(404).json({ message: "Cafe not found" });
+    res.json(cafe);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching cafe", error });
+  }
+});
+
 // CRUD Review Endpoints
 app.post("/api/reviews", authenticateToken, async (req, res) => {
   const { cafeId, rating, textReview, photos, videos } = req.body;
@@ -602,6 +613,45 @@ app.delete("/api/reviews/:id", authenticateToken, async (req, res) => {
   }
 });
 
+
+// CRUD Image Endpoints
+app.post("/api/upload", async (req, res) => {
+  const imageData = req.body.image;
+  const imageBuffer = Buffer.from(imageData.data, "base64");
+
+  try {
+    const savedImage = await Image.create({
+      name: imageData.name,
+      type: imageData.type,
+      data: imageBuffer,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Image uploaded successfully",
+      imageId: savedImage._id, // Return the image ID
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Unable to upload image",
+    });
+  }
+});
+// Handle GET request to /api/images/:id
+app.get("/api/images/:id", (req, res) => {
+  const id = req.params.id;
+  Image.findById(id)
+    .then((image) => {
+      res.setHeader("Content-Type", image.type);
+      res.send(image.data);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error retrieving image");
+    });
+});
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

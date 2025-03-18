@@ -15,51 +15,48 @@ export default function Profile() {
     const fetchData = async () => {
       try {
         const userDataString = localStorage.getItem("userData");
-        if (!userDataString) {
-          throw new Error("No user data found");
-        }
+        if (!userDataString) throw new Error("No user data found");
 
         const userData = JSON.parse(userDataString);
-        const userId = userData._id;
+        const response = await api.get(`/api/users/${userData._id}`);
 
-        // Fetch user profile first
-        const profileResponse = await api.get(`/api/users/${userId}`);
-        setUserProfile(profileResponse.data);
+        const userProfile = response.data;
+        setUserProfile(userProfile);
 
-        // Then fetch user reviews using the fetched profile
-        const reviewsResponse = await api.get(`/api/reviews/user/${userId}`);
-        const reviewsWithUserInfo = reviewsResponse.data.map((review) => ({
-          ...review,
-          user: profileResponse.data.username,
-          profileImage:
-            profileResponse.data.profilePicture ||
-            "https://via.placeholder.com/150",
-          date: review.date || review.createdAt || new Date().toISOString(),
-          photos: review.photos || [],
-          videos: review.videos || [],
-          rating: review.rating || {
-            ambiance: review.ambiance || 0,
-            drinkQuality: review.drinkQuality || 0,
-            service: review.service || 0,
-            wifiReliability: review.wifiReliability || 0,
-            cleanliness: review.cleanliness || 0,
-            valueForMoney: review.valueForMoney || 0,
-          },
-          textReview: review.textReview || review.content || "",
-        }));
+        const reviewsResponse = await api.get(`/api/reviews/user/${userData._id}`);
+        const reviewsWithUserInfo = processReviews(reviewsResponse.data, userProfile);
+
         setUserReviews(reviewsWithUserInfo);
-        console.log("User Reviews:", reviewsWithUserInfo);
-
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
-        setError("Failed to load data");
+        setError(err.response?.data?.message || "Failed to load data");
         setLoading(false);
       }
     };
 
     fetchData();
   }, []);
+
+  const processReviews = (reviews, userProfile) => {
+    return reviews.map(review => ({
+      ...review,
+      user: userProfile.username,
+      profileImage: userProfile.profilePicture,
+      date: review.date || review.createdAt || new Date().toISOString(),
+      photos: review.photos || [],
+      videos: review.videos || [],
+      rating: {
+        ambiance: review.rating?.ambiance || 0,
+        drinkQuality: review.rating?.drinkQuality || 0,
+        service: review.rating?.service || 0,
+        wifiReliability: review.rating?.wifiReliability || 0,
+        cleanliness: review.rating?.cleanliness || 0,
+        valueForMoney: review.rating?.valueForMoney || 0,
+      },
+      textReview: review.textReview || review.content || "",
+    }));
+  };
 
   const handleEditClick = () => {
     navigate("/edit-profile");
@@ -171,8 +168,17 @@ export default function Profile() {
       </div>
       <div className="profile-image">
         <img
-          src={userProfile.profilePicture}
-          alt={`${userProfile.username}'s profile`}
+          src={
+            userProfile.profilePicture.startsWith("http") || 
+            userProfile.profilePicture.startsWith("data:image")
+              ? userProfile.profilePicture
+              : `http://localhost:5500/api/images/${userProfile.profilePicture}`
+          }
+          alt={`${userProfile.firstName}'s profile`}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "https://cdn-icons-png.flaticon.com/512/147/147285.png";
+          }}
         />
       </div>
       <div className="profile-information">

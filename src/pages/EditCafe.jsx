@@ -17,11 +17,12 @@ export default function EditCafe() {
       Saturday: "",
       Sunday: "",
     },
+    logo: "", // Added logo field
     photos: [],
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Retrieve cafe data from the backend
     const fetchCafeData = async () => {
       try {
         const response = await axios.get("http://localhost:5500/api/cafe", {
@@ -36,11 +37,13 @@ export default function EditCafe() {
           name: cafe.cafeName,
           address: cafe.address,
           operatingHours: cafe.operatingHours,
-          photos: cafe.photos,
+          logo: cafe.logo || "", // Initialize logo
+          photos: cafe.photos || [],
           slug: cafe.slug,
         });
       } catch (error) {
         console.error("Error fetching cafe data:", error);
+        alert("Failed to fetch cafe data. Please try again.");
       }
     };
 
@@ -66,26 +69,83 @@ export default function EditCafe() {
     }));
   };
 
-  const handlePhotosChange = (e) => {
-    const files = Array.from(e.target.files);
-    const readers = files.map((file) => {
+  const handleLogoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      return new Promise((resolve) => {
-        reader.onloadend = () => resolve(reader.result);
-      });
-    });
+      reader.onloadend = async () => {
+        const base64Data = reader.result.split(",")[1];
+        const uploadResponse = await axios.post("http://localhost:5500/api/upload", {
+          image: {
+            name: `logo-${Date.now()}`,
+            type: file.type,
+            data: base64Data,
+          },
+        });
 
-    Promise.all(readers).then((photos) => {
+        if (uploadResponse.data.success) {
+          setCafeDetails((prev) => ({
+            ...prev,
+            logo: uploadResponse.data.imageId, // Store the image ID
+          }));
+        } else {
+          throw new Error("Failed to upload logo");
+        }
+      };
+    } catch (error) {
+      console.error("Error uploading logo:", error);
+      alert("Failed to upload logo. Please try again.");
+    }
+  };
+
+  const handlePhotosChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    try {
+      const uploadPromises = files.map(async (file) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        return new Promise((resolve) => {
+          reader.onloadend = async () => {
+            const base64Data = reader.result.split(",")[1];
+            const uploadResponse = await axios.post("http://localhost:5500/api/upload", {
+              image: {
+                name: `cafe-photo-${Date.now()}`,
+                type: file.type,
+                data: base64Data,
+              },
+            });
+            resolve(uploadResponse.data.imageId); // Resolve with image ID
+          };
+        });
+      });
+
+      const newPhotoIds = await Promise.all(uploadPromises);
       setCafeDetails((prev) => ({
         ...prev,
-        photos: [...prev.photos, ...photos],
+        photos: [...prev.photos, ...newPhotoIds],
       }));
-    });
+    } catch (error) {
+      console.error("Error uploading photos:", error);
+      alert("Failed to upload photos. Please try again.");
+    }
+  };
+
+  const handleRemovePhoto = (index) => {
+    setCafeDetails((prev) => ({
+      ...prev,
+      photos: prev.photos.filter((_, i) => i !== index),
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
       const response = await axios.put(
         `http://localhost:5500/api/cafes/${cafeDetails.slug}`,
@@ -93,6 +153,7 @@ export default function EditCafe() {
           cafeName: cafeDetails.name,
           address: cafeDetails.address,
           operatingHours: cafeDetails.operatingHours,
+          logo: cafeDetails.logo,
           photos: cafeDetails.photos,
         },
         {
@@ -111,7 +172,15 @@ export default function EditCafe() {
     } catch (error) {
       console.error("Error updating cafe:", error);
       alert("An error occurred while updating the cafe.");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const getImageUrl = (image) => {
+    if (!image) return "/images/default-cafe-logo.png";
+    if (image.startsWith("http") || image.startsWith("data:image")) return image;
+    return `http://localhost:5500/api/images/${image}`;
   };
 
   return (
@@ -157,6 +226,23 @@ export default function EditCafe() {
           ))}
         </div>
         <div className="form-group">
+          <label htmlFor="logo">Cafe Logo</label>
+          <input
+            type="file"
+            id="logo"
+            name="logo"
+            accept="image/*"
+            onChange={handleLogoChange}
+          />
+          {cafeDetails.logo && (
+            <img
+              src={getImageUrl(cafeDetails.logo)}
+              alt="Cafe Logo"
+              className="logo-preview"
+            />
+          )}
+        </div>
+        <div className="form-group">
           <label htmlFor="photos">Photos</label>
           <input
             type="file"
@@ -168,12 +254,21 @@ export default function EditCafe() {
           />
           <div className="photos-preview">
             {cafeDetails.photos.map((photo, index) => (
-              <img key={index} src={photo} alt={`Cafe photo ${index + 1}`} />
+              <div key={index} className="photo-item">
+                <img src={getImageUrl(photo)} alt={`Cafe photo ${index + 1}`} />
+                <button
+                  type="button"
+                  className="remove-photo-btn"
+                  onClick={() => handleRemovePhoto(index)}
+                >
+                  ×
+                </button>
+              </div>
             ))}
           </div>
         </div>
-        <button type="submit" className="save-cafe-btn">
-          Save Changes
+        <button type="submit" className="save-cafe-btn" disabled={loading}>
+          {loading ? "Saving..." : "Save Changes"}
         </button>
       </form>
     </div>

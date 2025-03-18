@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
     password: String,
     profilePicture: {
       type: String,
-      default: "",
+      default: "https://cdn-icons-png.flaticon.com/512/147/147285.png",
     },
     role: String,
     preferences: Object,

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import CafeCard from "../components/CafeCard";
 import "../styles/CafeListing.css";
+import axios from "axios";
 
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -19,34 +20,37 @@ function useDebounce(value, delay) {
 }
 
 export default function CafeListing() {
-  const [cafes, setCafes] = useState([]); // Initialize cafes as an empty array
+  const [cafes, setCafes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState(null); // Add error state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   useEffect(() => {
     const fetchCafes = async () => {
       setLoading(true);
-      setError(null); // Clear any previous errors
+      setError(null);
+
       try {
-        const response = await fetch("http://localhost:5500/api/cafes");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setCafes(data); // Assuming the API returns { cafes: [...] }
-      } catch (e) {
-        console.error("Failed to fetch cafes:", e);
-        setError(e);
+        const response = await axios.get("http://localhost:5500/api/cafes");
+        setCafes(response.data); // Assuming the API returns an array of cafes
+      } catch (error) {
+        console.error("Failed to fetch cafes:", error);
+        setError(error.response?.data?.message || "Failed to fetch cafes");
       } finally {
         setLoading(false);
       }
     };
 
     fetchCafes();
-  }, []); // Empty dependency array means this runs only once on component mount
+  }, []);
+
+  const getImageUrl = (image) => {
+    if (!image) return "/images/default-cafe-image.jpg";
+    if (image.startsWith("http") || image.startsWith("data:image")) return image;
+    return `http://localhost:5500/api/images/${image}`;
+  };
 
   const filteredCafes = cafes
     .filter((cafe) =>
@@ -54,7 +58,7 @@ export default function CafeListing() {
     )
     .sort((a, b) =>
       sortOrder === "asc"
-        ? (a.averageReview || 0) - (b.averageReview || 0) // Use 0 if averageReview is undefined
+        ? (a.averageReview || 0) - (b.averageReview || 0)
         : (b.averageReview || 0) - (a.averageReview || 0)
     );
 
@@ -65,7 +69,7 @@ export default function CafeListing() {
   if (error) {
     return (
       <section className="cafe-listing">
-        Error: {error.message}
+        Error: {error}
       </section>
     );
   }
@@ -87,10 +91,12 @@ export default function CafeListing() {
       </div>
       <div className="cafe-grid">
         {filteredCafes.map((cafe) => (
-          <a href={`/cafe/${cafe.slug}`} key={cafe._id}> {/* Use "/cafe" */}
+          <a href={`/cafe/${cafe.slug}`} key={cafe._id}>
             <CafeCard
-              image={cafe.photos?.[0] || "/default-image.jpg"}
+              image={getImageUrl(cafe.photos?.[0])} // Use the first photo or a default image
               title={cafe.cafeName}
+              rating={cafe.averageReview?.toFixed(1) || "N/A"}
+              address={cafe.address}
             />
           </a>
         ))}
