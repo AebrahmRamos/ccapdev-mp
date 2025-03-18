@@ -456,6 +456,80 @@ app.get("/api/reviews/user/:userId", authenticateToken, async (req, res) => {
   }
 });
 
+app.put("/api/reviews/:id", authenticateToken, async (req, res) => {
+  const reviewId = req.params.id;
+  const { rating, textReview } = req.body;
+
+  try {
+    // Validate rating fields
+    if (rating) {
+      const requiredRatingFields = [
+        "ambiance",
+        "drinkQuality",
+        "service",
+        "wifiReliability",
+        "cleanliness",
+        "valueForMoney",
+      ];
+      for (const field of requiredRatingFields) {
+        if (!rating[field] || rating[field] < 1 || rating[field] > 5) {
+          return res.status(400).json({ message: `Invalid rating for ${field}` });
+        }
+      }
+    }
+
+    // Validate textReview length if provided
+    if (textReview && (textReview.length < 10 || textReview.length > 1000)) {
+      return res.status(400).json({
+        message: "Text review must be between 10 and 1000 characters",
+      });
+    }
+
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    // Check if the user owns this review
+    if (review.userId.toString() !== req.user.userId) {
+      return res.status(403).json({ message: "Not authorized to edit this review" });
+    }
+
+    // Update the review
+    if (rating) review.rating = rating;
+    if (textReview) review.textReview = textReview;
+
+    await review.save();
+    res.status(200).json({ message: "Review updated successfully", review });
+  } catch (error) {
+    console.error("Error updating review:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Update a review
+app.put("/api/reviews/:id", authenticateToken, async (req, res) => {
+  const reviewId = req.params.id;
+  const { textReview, rating } = req.body;
+
+  try {
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    // Update review fields
+    review.textReview = textReview;
+    review.rating = rating;
+
+    await review.save();
+    res.status(200).json({ message: "Review updated successfully", review });
+  } catch (error) {
+    console.error("Error updating review:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 app.delete("/api/reviews/:id", authenticateToken, async (req, res) => {
   const reviewId = req.params.id;
 

@@ -273,6 +273,128 @@
   border-radius: 4px;
 }
 
+.reviewActions {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.editButton,
+.deleteButton {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background-color 0.2s;
+}
+
+.editButton {
+  background-color: #6B7050;
+  color: white;
+}
+
+.editButton:hover {
+  background-color: #565832;
+}
+
+.deleteButton {
+  background-color: #806044;
+  color: white;
+}
+
+.deleteButton:hover {
+  background-color: #A66B6B;
+}
+
+.editReviewForm {
+  background: #f5f1ea;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.ratingInputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.ratingInputs div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ratingInputs label {
+  font-weight: 500;
+  color: #3E2F28;
+}
+
+.ratingInputs input {
+  padding: 8px;
+  border: 1px solid #C8B89F;
+  border-radius: 4px;
+  background: white;
+}
+
+.reviewTextArea {
+  margin-bottom: 20px;
+}
+
+.reviewTextArea label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #3E2F28;
+}
+
+.reviewTextArea textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #C8B89F;
+  border-radius: 4px;
+  background: white;
+  resize: vertical;
+}
+
+.formButtons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.saveButton {
+  background-color: #6B7050;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.saveButton:hover {
+  background-color: #565832;
+}
+
+.cancelButton {
+  background-color: #C8B89F;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancelButton:hover {
+  background-color: #B3A48C;
+}
 
 .modalOverlay {
   position: fixed;
@@ -287,8 +409,6 @@
   z-index: 1000;
 }
 
-
-
 .modalContent {
   background-color: white;
   padding: 20px;
@@ -297,10 +417,7 @@
   max-width: 90%;
   max-height: 90%;
   overflow: auto;
-
 }
-
-
 
 .closeButton {
   position: absolute;
@@ -312,43 +429,37 @@
   cursor: pointer;
 }
 
-
-
 .modalImage {
-
   max-width: 100%;
-
   max-height: 80vh;
-
 }
-
 
 @media (max-width: 991px) {
   .headerContainer {
     padding: 20px;
   }
-  
+
   .headerLayout {
     flex-direction: column;
   }
-  
+
   .infoColumn,
   .imageColumn {
     width: 100%;
   }
-  
+
   .cafeName {
     font-size: inherit;
   }
-  
+
   .hoursSection {
     margin-top: 40px;
   }
-  
+
   .cafeImage {
     margin-top: 40px;
   }
-  
+
   .galleryContainer {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -363,19 +474,19 @@
     border-radius: 8px;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   }
-  
+
   .reviewCard {
     padding: 20px;
   }
-  
+
   .amenityDetails {
     margin-left: 10px;
   }
-  
+
   .reviewImages {
     margin: 40px 0 0 10px;
   }
-  
+
   .helpfulButton {
     margin: 40px 0 0 10px;
   }

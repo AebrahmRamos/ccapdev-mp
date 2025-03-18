@@ -25,17 +25,28 @@ export default function Profile() {
         // Fetch user profile first
         const profileResponse = await api.get(`/api/users/${userId}`);
         setUserProfile(profileResponse.data);
-        // console.log('User Data:', profileResponse.data); // Added console.log
 
         // Then fetch user reviews using the fetched profile
         const reviewsResponse = await api.get(`/api/reviews/user/${userId}`);
         const reviewsWithUserInfo = reviewsResponse.data.map((review) => ({
           ...review,
           user: profileResponse.data.username,
-          profileImage: profileResponse.data.profilePicture,
+          profileImage: profileResponse.data.profilePicture || 'https://via.placeholder.com/150',
+          date: review.date || review.createdAt || new Date().toISOString(),
+          photos: review.photos || [],
+          videos: review.videos || [],
+          rating: review.rating || {
+            ambiance: review.ambiance || 0,
+            drinkQuality: review.drinkQuality || 0,
+            service: review.service || 0,
+            wifiReliability: review.wifiReliability || 0,
+            cleanliness: review.cleanliness || 0,
+            valueForMoney: review.valueForMoney || 0
+          },
+          textReview: review.textReview || review.content || ''
         }));
         setUserReviews(reviewsWithUserInfo);
-        console.log("User Reviews:", reviewsWithUserInfo); // Added console.log
+        console.log("User Reviews:", reviewsWithUserInfo);
 
         setLoading(false);
       } catch (err) {
@@ -58,6 +69,44 @@ export default function Profile() {
     localStorage.removeItem("userData");
     // Redirect to login page
     navigate("/login");
+  };
+
+  const handleEditReview = async (reviewId, updatedReview) => {
+    try {
+      console.log('Sending update for review:', reviewId, updatedReview);
+      const response = await api.put(`/api/reviews/${reviewId}`, updatedReview);
+      console.log('Update response:', response.data);
+
+      // Update the reviews list with the edited review, preserving other fields
+      setUserReviews(prevReviews =>
+        prevReviews.map(review =>
+          review._id === reviewId
+            ? {
+              ...review,
+              ...updatedReview,
+              rating: {
+                ...review.rating,
+                ...updatedReview.rating
+              }
+            }
+            : review
+        )
+      );
+    } catch (error) {
+      console.error('Error editing review:', error);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    if (window.confirm('Are you sure you want to delete this review?')) {
+      try {
+        await api.delete(`/api/reviews/${reviewId}`);
+        // Update the reviews list by filtering out the deleted review
+        setUserReviews(prevReviews => prevReviews.filter(review => review._id !== reviewId));
+      } catch (error) {
+        console.error('Error deleting review:', error);
+      }
+    }
   };
 
   if (loading) {
@@ -108,7 +157,12 @@ export default function Profile() {
       </div>
       {userReviews.length > 0 && (
         <div className="reviews" style={{ width: "100%" }}>
-          <ReviewsSection reviews={userReviews} />
+          <ReviewsSection
+            reviews={userReviews}
+            isProfilePage={true}
+            onEdit={handleEditReview}
+            onDelete={handleDeleteReview}
+          />
         </div>
       )}
     </div>
