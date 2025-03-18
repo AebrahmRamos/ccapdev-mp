@@ -29,6 +29,7 @@ const ReviewSubmission = () => {
   });
   const [photos, setPhotos] = useState([]);
   const [userId, setUserId] = useState(""); // This should come from your auth system
+  const [userRole, setUserRole] = useState(""); // This should come from your auth system
 
   // Fetch all cafes when the component mounts
   useEffect(() => {
@@ -46,12 +47,14 @@ const ReviewSubmission = () => {
   }, []);
 
   useEffect(() => {
-    // Get user ID from local storage or auth context
+    // Get user ID and role from local storage or auth context
     const getCurrentUser = () => {
       // This should be replaced with your actual authentication logic
       const user = localStorage.getItem("userData");
       if (user) {
-        setUserId(JSON.parse(user)._id);
+        const userData = JSON.parse(user);
+        setUserId(userData._id);
+        setUserRole(userData.role); // Assuming the user data contains a role field
       }
     };
 
@@ -154,112 +157,120 @@ const ReviewSubmission = () => {
       <h1>Submit Your Review</h1>
       {error && <div className="error-message">{error}</div>}
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (reviewText.length < 20) {
-            setError("Review must be at least 20 characters long");
-            return;
-          }
-          handleSubmit(e);
-        }}
-      >
-        <div className="cafe-search-section">
-          <label htmlFor="cafeSelect">Select a Cafe</label>
-          <select id="cafeSelect" onChange={handleCafeSelect} required>
-            <option value="">Select a cafe...</option>
-            {cafes.map((cafe) => (
-              <option key={cafe._id} value={cafe._id}>
-                {cafe.cafeName}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {selectedCafe && (
-          <div className="selected-cafe-info">
-            <h3>{selectedCafe.cafeName}</h3>
+      {userRole === "Student" ? (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (reviewText.length < 20) {
+              setError("Review must be at least 20 characters long");
+              return;
+            }
+            handleSubmit(e);
+          }}
+        >
+          <div className="cafe-search-section">
+            <label htmlFor="cafeSelect">Select a Cafe</label>
+            <select id="cafeSelect" onChange={handleCafeSelect} required>
+              <option value="">Select a cafe...</option>
+              {cafes.map((cafe) => (
+                <option key={cafe._id} value={cafe._id}>
+                  {cafe.cafeName}
+                </option>
+              ))}
+            </select>
           </div>
-        )}
 
-        {/* Rating sections */}
-        {ratingCategories.map((category) => (
-          <div className="rating-section" key={category.key}>
-            <label>{category.label}</label>
-            <div className="star-rating">
-              {[...Array(5)].map((_, index) => {
-                const ratingValue = index + 1;
-                return (
-                  <FaStar
-                    key={ratingValue}
-                    className={
-                      ratingValue <=
-                      (hover[category.key] || ratings[category.key])
-                        ? "star active"
-                        : "star"
-                    }
-                    onClick={() => handleRatingClick(category.key, ratingValue)}
-                    onMouseEnter={() =>
-                      setHover((prev) => ({
-                        ...prev,
-                        [category.key]: ratingValue,
-                      }))
-                    }
-                    onMouseLeave={() =>
-                      setHover((prev) => ({ ...prev, [category.key]: 0 }))
-                    }
-                  />
-                );
-              })}
+          {selectedCafe && (
+            <div className="selected-cafe-info">
+              <h3>{selectedCafe.cafeName}</h3>
+            </div>
+          )}
+
+          {/* Rating sections */}
+          {ratingCategories.map((category) => (
+            <div className="rating-section" key={category.key}>
+              <label>{category.label}</label>
+              <div className="star-rating">
+                {[...Array(5)].map((_, index) => {
+                  const ratingValue = index + 1;
+                  return (
+                    <FaStar
+                      key={ratingValue}
+                      className={
+                        ratingValue <=
+                        (hover[category.key] || ratings[category.key])
+                          ? "star active"
+                          : "star"
+                      }
+                      onClick={() =>
+                        handleRatingClick(category.key, ratingValue)
+                      }
+                      onMouseEnter={() =>
+                        setHover((prev) => ({
+                          ...prev,
+                          [category.key]: ratingValue,
+                        }))
+                      }
+                      onMouseLeave={() =>
+                        setHover((prev) => ({ ...prev, [category.key]: 0 }))
+                      }
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+
+          <div className="overall-rating">
+            <label>Overall Rating</label>
+            <div className="rating-display">
+              {calculateAverageRating().toFixed(1)} / 5
             </div>
           </div>
-        ))}
 
-        <div className="overall-rating">
-          <label>Overall Rating</label>
-          <div className="rating-display">
-            {calculateAverageRating().toFixed(1)} / 5
+          <div className="review-text-section">
+            <label htmlFor="reviewText">Your Review</label>
+            <textarea
+              id="reviewText"
+              placeholder="Write your detailed review here (minimum 20 characters)..."
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              required
+              rows={5}
+            />
+            <div className="character-count">
+              Characters: {reviewText.length}{" "}
+              {reviewText.length < 20 && "(minimum 20 required)"}
+            </div>
           </div>
-        </div>
 
-        <div className="review-text-section">
-          <label htmlFor="reviewText">Your Review</label>
-          <textarea
-            id="reviewText"
-            placeholder="Write your detailed review here (minimum 20 characters)..."
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-            required
-            rows={5}
-          />
-          <div className="character-count">
-            Characters: {reviewText.length}{" "}
-            {reviewText.length < 20 && "(minimum 20 required)"}
+          <div className="photo-upload-section">
+            <label htmlFor="photoUpload">Add Photos (Optional)</label>
+            <input
+              type="file"
+              id="photoUpload"
+              multiple
+              accept="image/*"
+              onChange={handlePhotoUpload}
+            />
+            <div className="photo-preview">
+              {photos.length > 0 && `${photos.length} photo(s) selected`}
+            </div>
           </div>
-        </div>
 
-        <div className="photo-upload-section">
-          <label htmlFor="photoUpload">Add Photos (Optional)</label>
-          <input
-            type="file"
-            id="photoUpload"
-            multiple
-            accept="image/*"
-            onChange={handlePhotoUpload}
-          />
-          <div className="photo-preview">
-            {photos.length > 0 && `${photos.length} photo(s) selected`}
-          </div>
+          <button
+            type="submit"
+            className="submit-review-btn"
+            disabled={isLoading || !selectedCafe || reviewText.length < 20}
+          >
+            {isLoading ? "Submitting..." : "Submit Review"}
+          </button>
+        </form>
+      ) : (
+        <div className="error-message">
+          Only students are allowed to submit reviews.
         </div>
-
-        <button
-          type="submit"
-          className="submit-review-btn"
-          disabled={isLoading || !selectedCafe || reviewText.length < 20}
-        >
-          {isLoading ? "Submitting..." : "Submit Review"}
-        </button>
-      </form>
+      )}
     </div>
   );
 };
