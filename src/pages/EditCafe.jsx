@@ -17,8 +17,8 @@ export default function EditCafe() {
       Saturday: "",
       Sunday: "",
     },
-    logo: "", // Added logo field
     photos: [],
+    slug: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +37,6 @@ export default function EditCafe() {
           name: cafe.cafeName,
           address: cafe.address,
           operatingHours: cafe.operatingHours,
-          logo: cafe.logo || "", // Initialize logo
           photos: cafe.photos || [],
           slug: cafe.slug,
         });
@@ -87,10 +86,20 @@ export default function EditCafe() {
         });
 
         if (uploadResponse.data.success) {
-          setCafeDetails((prev) => ({
-            ...prev,
-            logo: uploadResponse.data.imageId, // Store the image ID
-          }));
+          setCafeDetails((prev) => {
+            // Create a new photos array with the logo as the first element
+            const newPhotos = [...prev.photos];
+            // Replace the first element (logo) or add it if photos array is empty
+            if (newPhotos.length > 0) {
+              newPhotos[0] = uploadResponse.data.imageId;
+            } else {
+              newPhotos.push(uploadResponse.data.imageId);
+            }
+            return {
+              ...prev,
+              photos: newPhotos,
+            };
+          });
         } else {
           throw new Error("Failed to upload logo");
         }
@@ -136,6 +145,12 @@ export default function EditCafe() {
   };
 
   const handleRemovePhoto = (index) => {
+    // Don't allow removing the logo (first photo)
+    if (index === 0) {
+      alert("Cannot remove logo. Please upload a new logo instead.");
+      return;
+    }
+    
     setCafeDetails((prev) => ({
       ...prev,
       photos: prev.photos.filter((_, i) => i !== index),
@@ -153,7 +168,6 @@ export default function EditCafe() {
           cafeName: cafeDetails.name,
           address: cafeDetails.address,
           operatingHours: cafeDetails.operatingHours,
-          logo: cafeDetails.logo,
           photos: cafeDetails.photos,
         },
         {
@@ -234,16 +248,16 @@ export default function EditCafe() {
             accept="image/*"
             onChange={handleLogoChange}
           />
-          {cafeDetails.logo && (
+          {cafeDetails.photos.length > 0 && (
             <img
-              src={getImageUrl(cafeDetails.logo)}
+              src={getImageUrl(cafeDetails.photos[0])}
               alt="Cafe Logo"
               className="logo-preview"
             />
           )}
         </div>
         <div className="form-group">
-          <label htmlFor="photos">Photos</label>
+          <label htmlFor="photos">Additional Photos</label>
           <input
             type="file"
             id="photos"
@@ -254,8 +268,8 @@ export default function EditCafe() {
           />
           <div className="photos-preview">
             {cafeDetails.photos.map((photo, index) => (
-              <div key={index} className="photo-item">
-                <img src={getImageUrl(photo)} alt={`Cafe photo ${index + 1}`} />
+              <div key={index} className={`photo-item ${index === 0 ? 'logo-item' : ''}`}>
+                <img src={getImageUrl(photo)} alt={index === 0 ? 'Cafe Logo' : `Cafe photo ${index}`} />
                 <button
                   type="button"
                   className="remove-photo-btn"

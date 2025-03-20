@@ -28,8 +28,10 @@ const ReviewSubmission = () => {
     valueForMoney: 0,
   });
   const [photos, setPhotos] = useState([]);
-  const [userId, setUserId] = useState(""); // This should come from your auth system
-  const [userRole, setUserRole] = useState(""); // This should come from your auth system
+  const [photoDataUrls, setPhotoDataUrls] = useState([]);
+  const [userId, setUserId] = useState(""); 
+  const [userRole, setUserRole] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   // Fetch all cafes when the component mounts
   useEffect(() => {
@@ -49,12 +51,11 @@ const ReviewSubmission = () => {
   useEffect(() => {
     // Get user ID and role from local storage or auth context
     const getCurrentUser = () => {
-      // This should be replaced with your actual authentication logic
       const user = localStorage.getItem("userData");
       if (user) {
         const userData = JSON.parse(user);
         setUserId(userData._id);
-        setUserRole(userData.role); // Assuming the user data contains a role field
+        setUserRole(userData.role);
       }
     };
 
@@ -75,15 +76,69 @@ const ReviewSubmission = () => {
   };
 
   const handlePhotoUpload = (e) => {
-    // Handle photo upload logic
-    // This is a placeholder - you'll need to implement file upload functionality
     const files = Array.from(e.target.files);
     setPhotos(files);
+    
+    // Clear previous preview URLs
+    setPhotoDataUrls([]);
+    
+    // Generate preview URLs for all selected files
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPhotoDataUrls(prevUrls => [...prevUrls, e.target.result]);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const calculateAverageRating = () => {
     const sum = Object.values(ratings).reduce((acc, curr) => acc + curr, 0);
     return sum / Object.keys(ratings).length;
+  };
+
+  const uploadSingleImage = async (file, index) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = async (event) => {
+        try {
+          const dataUrl = event.target.result;
+          const matches = dataUrl.match(/^data:(.+);base64,(.+)$/);
+          
+          if (!matches || matches.length !== 3) {
+            reject(new Error("Invalid image format"));
+            return;
+          }
+          
+          const imageType = matches[1];
+          const base64Data = matches[2];
+          
+          const uploadResponse = await axios.post(
+            "http://localhost:5500/api/upload",
+            {
+              image: {
+                name: `review-${Date.now()}-${index}`,
+                type: imageType,
+                data: base64Data,
+              },
+            }
+          );
+          
+          if (uploadResponse.data.success) {
+            resolve(uploadResponse.data.imageId);
+          } else {
+            reject(new Error("Failed to upload image"));
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          reject(error);
+        }
+      };
+      
+      reader.onerror = () => reject(new Error("Error reading file"));
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -108,6 +163,24 @@ const ReviewSubmission = () => {
 
     try {
       setIsLoading(true);
+      setUploadProgress(0);
+      
+      // Upload all photos in parallel
+      const photoIds = [];
+      const totalPhotos = photos.length;
+      
+      if (totalPhotos > 0) {
+        const uploadPromises = photos.map((file, index) => {
+          return uploadSingleImage(file, index).then(imageId => {
+            photoIds.push(imageId);
+            setUploadProgress(Math.round((photoIds.length / totalPhotos) * 100));
+            return imageId;
+          });
+        });
+        
+        // Wait for all uploads to complete
+        await Promise.all(uploadPromises);
+      }
 
       // Create review object
       const reviewData = {
@@ -115,8 +188,8 @@ const ReviewSubmission = () => {
         userId,
         rating: ratings,
         textReview: reviewText,
-        photos: [], // This would be replaced with actual photo URLs after upload
-        videos: [], // Not implemented in this version
+        photos: photoIds,
+        videos: [],
       };
 
       // Submit review
@@ -129,15 +202,16 @@ const ReviewSubmission = () => {
           },
         }
       );
-      console.log("Review submission response:", response.data);
 
+      console.log(response.data);
+      
       setIsLoading(false);
-
-      // Redirect to cafe page or show success message
+      setUploadProgress(0);
       alert("Review submitted successfully!");
       navigate(`/cafe/${selectedCafe.slug}`);
     } catch (err) {
       setIsLoading(false);
+      setUploadProgress(0);
       setError("Failed to submit review. Please try again.");
       console.error("Error submitting review:", err);
     }
@@ -151,6 +225,12 @@ const ReviewSubmission = () => {
     { key: "cleanliness", label: "Cleanliness" },
     { key: "valueForMoney", label: "Value for Money" },
   ];
+
+  // Remove a photo from the selection
+  const removePhoto = (index) => {
+    setPhotos(prev => prev.filter((_, i) => i !== index));
+    setPhotoDataUrls(prev => prev.filter((_, i) => i !== index));
+  };
 
   return (
     <div className="review-submission-container">
@@ -253,9 +333,48 @@ const ReviewSubmission = () => {
               accept="image/*"
               onChange={handlePhotoUpload}
             />
-            <div className="photo-preview">
-              {photos.length > 0 && `${photos.length} photo(s) selected`}
-            </div>
+            
+            {/* Photo previews */}
+            {photoDataUrls.length > 0 && (
+              <div className="photo-upload-container">
+                <div className="photo-previews">
+                  {photoDataUrls.map((url, index) => (
+                    <div key={index} className="photo-preview-item">
+                      <img 
+                        src={url}
+                        alt={`Preview ${index + 1}`}
+                        className="photo-preview-thumbnail"
+                      />
+                      <button 
+                        type="button" 
+                        className="remove-photo-btn"
+                        onClick={() => removePhoto(index)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="photo-count">
+                  {photoDataUrls.length} photo{photoDataUrls.length !== 1 ? 's' : ''} selected
+                </div>
+              </div>
+            )}
+            
+            {/* Upload progress indicator */}
+            {isLoading && uploadProgress > 0 && (
+              <div className="upload-progress">
+                <div className="progress-bar">
+                  <div 
+                    className="progress-fill" 
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+                <div className="progress-text">
+                  Uploading photos: {uploadProgress}%
+                </div>
+              </div>
+            )}
           </div>
 
           <button

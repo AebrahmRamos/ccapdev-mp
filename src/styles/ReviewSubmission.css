@@ -109,6 +109,20 @@
   font-family: "Cantata One", serif;
 }
 
+.photo-previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.photo-preview-thumbnail {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
 .submit-review-btn:hover {
   background-color: #5a3b28;
 }
@@ -121,3 +135,4 @@
     font-family: "Cantata One", serif;
   }
 }
+
