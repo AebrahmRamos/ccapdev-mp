@@ -116,8 +116,12 @@ function ReviewCard({
     });
   };
 
-  const visibleImages = photos.slice(currentIndex, currentIndex + IMAGES_PER_VIEW);
-  const displayImages = photos.length < IMAGES_PER_VIEW ? photos : visibleImages;
+  const visibleImages = photos.slice(
+    currentIndex,
+    currentIndex + IMAGES_PER_VIEW
+  );
+  const displayImages =
+    photos.length < IMAGES_PER_VIEW ? photos : visibleImages;
 
   if (loading) return <div>Loading review...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -134,7 +138,9 @@ function ReviewCard({
             e.target.src = "/images/default-profile.png";
           }}
         />
-        <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <div
+          style={{ display: "flex", flexDirection: "column", width: "100%" }}
+        >
           <div className={styles.reviewerInfo}>
             <div className={styles.reviewerMeta}>
               <span>{name}</span>
@@ -159,19 +165,23 @@ function ReviewCard({
               <strong>Ambiance:</strong> {rating.ambiance?.toFixed(0) || "N/A"}
             </div>
             <div>
-              <strong>Drink Quality:</strong> {rating.drinkQuality?.toFixed(0) || "N/A"}
+              <strong>Drink Quality:</strong>{" "}
+              {rating.drinkQuality?.toFixed(0) || "N/A"}
             </div>
             <div>
               <strong>Service:</strong> {rating.service?.toFixed(0) || "N/A"}
             </div>
             <div>
-              <strong>Wi-Fi Reliability:</strong> {rating.wifiReliability?.toFixed(0) || "N/A"}
+              <strong>Wi-Fi Reliability:</strong>{" "}
+              {rating.wifiReliability?.toFixed(0) || "N/A"}
             </div>
             <div>
-              <strong>Cleanliness:</strong> {rating.cleanliness?.toFixed(0) || "N/A"}
+              <strong>Cleanliness:</strong>{" "}
+              {rating.cleanliness?.toFixed(0) || "N/A"}
             </div>
             <div>
-              <strong>Value for Money:</strong> {rating.valueForMoney?.toFixed(0) || "N/A"}
+              <strong>Value for Money:</strong>{" "}
+              {rating.valueForMoney?.toFixed(0) || "N/A"}
             </div>
           </div>
         </div>
@@ -200,7 +210,10 @@ function ReviewCard({
           )}
           <div className={styles.galleryContainer}>
             {displayImages.map((image, index) => (
-              <div key={`${currentIndex}-${index}`} className={styles.galleryItem}>
+              <div
+                key={`${currentIndex}-${index}`}
+                className={styles.galleryItem}
+              >
                 <img
                   onClick={() => setSelectedImage(getImageUrl(image))}
                   src={getImageUrl(image)}
@@ -272,7 +285,13 @@ function ReviewCard({
   );
 }
 
-function ReviewsSection({ reviews = [], currentUserId, isProfilePage, onEditReview, onDeleteReview }) {
+function ReviewsSection({
+  reviews = [],
+  currentUserId,
+  isProfilePage,
+  onEditReview,
+  onDeleteReview,
+}) {
   return (
     <div className={styles.reviewsSection}>
       <h2 className={styles.reviewsTitle}>Reviews</h2>

@@ -10,7 +10,6 @@ const getImageUrl = (image) => {
 };
 
 export function ReviewCard({
-  date,
   profileImage,
   textReview,
   rating,
@@ -59,8 +58,12 @@ export function ReviewCard({
     });
   };
 
-  const visibleImages = photos.slice(currentIndex, currentIndex + IMAGES_PER_VIEW);
-  const displayImages = photos.length < IMAGES_PER_VIEW ? photos : visibleImages;
+  const visibleImages = photos.slice(
+    currentIndex,
+    currentIndex + IMAGES_PER_VIEW
+  );
+  const displayImages =
+    photos.length < IMAGES_PER_VIEW ? photos : visibleImages;
 
   return (
     <div className={styles.reviewCard}>
@@ -73,46 +76,43 @@ export function ReviewCard({
             e.target.src = "/images/default-profile.png";
           }}
         />
-        <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
-          <div className={styles.reviewerInfo}>
-            <div className={styles.reviewerMeta}>
-              <span></span>
-              <span>{new Date(date).toLocaleDateString()}</span>
-              {isProfilePage && onEdit && onDelete && reviewId && (
-                <div className={styles.reviewActions}>
-                  <button onClick={handleEdit} className={styles.editButton}>
-                    ✏️ Edit
-                  </button>
-                  <button
-                    onClick={() => onDelete(reviewId)}
-                    className={styles.deleteButton}
-                  >
-                    🗑️ Delete
-                  </button>
-                </div>
-              )}
-            </div>
+
+        <div className={styles.amenityDetails}>
+          <div>
+            <strong>Ambiance:</strong> {rating.ambiance}
           </div>
-          <div className={styles.amenityDetails}>
-            <div>
-              <strong>Ambiance:</strong> {rating.ambiance}
-            </div>
-            <div>
-              <strong>Drink Quality:</strong> {rating.drinkQuality}
-            </div>
-            <div>
-              <strong>Service:</strong> {rating.service}
-            </div>
-            <div>
-              <strong>Wi-Fi Reliability:</strong> {rating.wifiReliability}
-            </div>
-            <div>
-              <strong>Cleanliness:</strong> {rating.cleanliness}
-            </div>
-            <div>
-              <strong>Value for Money:</strong> {rating.valueForMoney}
-            </div>
+          <div>
+            <strong>Drink Quality:</strong> {rating.drinkQuality}
           </div>
+          <div>
+            <strong>Service:</strong> {rating.service}
+          </div>
+          <div>
+            <strong>Wi-Fi Reliability:</strong> {rating.wifiReliability}
+          </div>
+          <div>
+            <strong>Cleanliness:</strong> {rating.cleanliness}
+          </div>
+          <div>
+            <strong>Value for Money:</strong> {rating.valueForMoney}
+          </div>
+        </div>
+        <div className={styles.reviewerInfo}></div>
+
+        <div className={styles.reviewerMeta}>
+          {isProfilePage && onEdit && onDelete && reviewId && (
+            <div className={styles.reviewActions}>
+              <button onClick={handleEdit} className={styles.editButton}>
+                ✏️ Edit
+              </button>
+              <button
+                onClick={() => onDelete(reviewId)}
+                className={styles.deleteButton}
+              >
+                🗑️ Delete
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -139,7 +139,10 @@ export function ReviewCard({
           )}
           <div className={styles.galleryContainer}>
             {displayImages.map((image, index) => (
-              <div key={`${currentIndex}-${index}`} className={styles.galleryItem}>
+              <div
+                key={`${currentIndex}-${index}`}
+                className={styles.galleryItem}
+              >
                 <img
                   onClick={() => setSelectedImage(getImageUrl(image))}
                   src={getImageUrl(image)}

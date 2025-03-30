@@ -50,7 +50,8 @@ const TrendingCafes = () => {
 
   const getImageUrl = (image) => {
     if (!image) return "/images/default-cafe-image.jpg";
-    if (image.startsWith("http") || image.startsWith("data:image")) return image;
+    if (image.startsWith("http") || image.startsWith("data:image"))
+      return image;
     return `http://localhost:5500/api/images/${image}`;
   };
 
@@ -156,7 +157,11 @@ const TrendingCafes = () => {
                   </Box>
                 </Box>
                 <Box flexGrow={1} />
-                <Box padding={2} display={"flex"} flexDirection={"column"}></Box>
+                <Box
+                  padding={2}
+                  display={"flex"}
+                  flexDirection={"column"}
+                ></Box>
               </Box>
             </Box>
           </Grid>

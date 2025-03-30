@@ -24,15 +24,19 @@ export function CafeDetails({
                 />
                 <span className={styles.ratingScore}>({averageReview})</span>
                 <span className={styles.reviewCount}>
-                  Total Reviews: {totalReviews}
+                  <strong>Total Reviews:</strong> {totalReviews}
                 </span>
               </div>
             </div>
             <div className={styles.address}>
-              <span>Address: {address}</span>
+              <span>
+                <strong>Address:</strong> {address}
+              </span>
             </div>
             <div className={styles.hoursSection}>
-              <div className={styles.hoursTitle}>Opening Hours:</div>
+              <div className={styles.hoursTitle}>
+                <strong>Opening Hours:</strong>
+              </div>
               <div className={styles.hoursList}>
                 <div className={styles.hoursDay}>
                   {Object.keys(operatingHours).map((day) => (

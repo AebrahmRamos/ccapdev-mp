@@ -121,7 +121,7 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  margin: 54px;
+  margin: 20px;
   padding: 0 57px;
 }
 
@@ -131,11 +131,12 @@
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   gap: 20px;
+  width: 100%;
 }
 
 .galleryItem {
   flex: 0 0 calc(25% - 20px);
-  scroll-snap-align: start;
+  scroll-snap-align: center;
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 8px;
@@ -184,7 +185,7 @@
 
 .reviewCard {
   position: relative;
-  background: rgba(234, 225, 210, 1);
+  background: whitesmoke;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
   padding: 30px 58px;
   margin-bottom: 20px;
@@ -242,7 +243,8 @@
 .reviewText {
   color: rgba(0, 0, 0, 1);
   font: 400 Cantata One, -apple-system, Roboto, Helvetica, sans-serif;
-  margin-top: 31px;
+  margin-top: 10px;
+  margin-left: 80px;
   text-align: left;
 }
 
@@ -282,7 +284,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
 .editButton,
@@ -441,13 +443,14 @@
   max-height: 80vh;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 768px) {
   .headerContainer {
     padding: 20px;
   }
 
   .headerLayout {
     flex-direction: column;
+    margin-top: 30px;
   }
 
   .infoColumn,
@@ -455,24 +458,21 @@
     width: 100%;
   }
 
-  .cafeName {
-    font-size: inherit;
-  }
-
   .hoursSection {
     margin-top: 40px;
   }
 
   .cafeImage {
-    margin-top: 40px;
+    max-width: 250px;
   }
 
   .galleryContainer {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
     max-width: 1200px;
     width: 100%;
+    overflow: hidden;
   }
 
   .galleryItem {
