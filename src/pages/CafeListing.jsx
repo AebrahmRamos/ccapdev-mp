@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import CafeCard from "../components/CafeCard";
 import "../styles/CafeListing.css";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -48,7 +49,8 @@ export default function CafeListing() {
 
   const getImageUrl = (image) => {
     if (!image) return "/images/default-cafe-image.jpg";
-    if (image.startsWith("http") || image.startsWith("data:image")) return image;
+    if (image.startsWith("http") || image.startsWith("data:image"))
+      return image;
     return `http://localhost:5500/api/images/${image}`;
   };
 
@@ -67,40 +69,45 @@ export default function CafeListing() {
   }
 
   if (error) {
-    return (
-      <section className="cafe-listing">
-        Error: {error}
-      </section>
-    );
+    return <section className="cafe-listing">Error: {error}</section>;
   }
 
   return (
-    <section className="cafe-listing">
-      <h1 className="title">Cafe Listing</h1>
-      <div className="search-filter">
-        <input
-          type="text"
-          placeholder="Search cafes..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
-          <option value="asc">Sort by Rating: Low to High</option>
-          <option value="desc">Sort by Rating: High to Low</option>
-        </select>
-      </div>
-      <div className="cafe-grid">
-        {filteredCafes.map((cafe) => (
-          <a href={`/cafe/${cafe.slug}`} key={cafe._id}>
-            <CafeCard
-              image={getImageUrl(cafe.photos?.[0])} // Use the first photo or a default image
-              title={cafe.cafeName}
-              rating={cafe.averageReview?.toFixed(1) || "N/A"}
-              address={cafe.address}
-            />
-          </a>
-        ))}
-      </div>
-    </section>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <section className="cafe-listing">
+        <h1 className="title">Cafe Listing</h1>
+        <div className="search-filter">
+          <input
+            type="text"
+            placeholder="Search cafes..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <option value="asc">Sort by Rating: Low to High</option>
+            <option value="desc">Sort by Rating: High to Low</option>
+          </select>
+        </div>
+        <div className="cafe-grid">
+          {filteredCafes.map((cafe) => (
+            <a href={`/cafe/${cafe.slug}`} key={cafe._id}>
+              <CafeCard
+                image={getImageUrl(cafe.photos?.[0])} // Use the first photo or a default image
+                title={cafe.cafeName}
+                rating={cafe.averageReview?.toFixed(1) || "N/A"}
+                address={cafe.address}
+              />
+            </a>
+          ))}
+        </div>
+      </section>
+    </motion.div>
   );
 }

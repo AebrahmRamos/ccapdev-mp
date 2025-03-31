@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../utils/axiosConfig";
 import "../styles/Profile.css";
 import { ReviewsSection } from "../components/ReviewsSection";
+import { motion } from "framer-motion";
 
 export default function Profile() {
   const [userProfile, setUserProfile] = useState(null);
@@ -23,8 +24,13 @@ export default function Profile() {
         const userProfile = response.data;
         setUserProfile(userProfile);
 
-        const reviewsResponse = await api.get(`/api/reviews/user/${userData._id}`);
-        const reviewsWithUserInfo = processReviews(reviewsResponse.data, userProfile);
+        const reviewsResponse = await api.get(
+          `/api/reviews/user/${userData._id}`
+        );
+        const reviewsWithUserInfo = processReviews(
+          reviewsResponse.data,
+          userProfile
+        );
 
         setUserReviews(reviewsWithUserInfo);
         setLoading(false);
@@ -39,7 +45,7 @@ export default function Profile() {
   }, []);
 
   const processReviews = (reviews, userProfile) => {
-    return reviews.map(review => ({
+    return reviews.map((review) => ({
       ...review,
       user: userProfile.username,
       profileImage: userProfile.profilePicture,
@@ -159,7 +165,12 @@ export default function Profile() {
   }
 
   return (
-    <div className="profile">
+    <motion.div
+      className="profile"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <div className="profile-cover">
         <img
           src="https://t3.ftcdn.net/jpg/01/94/82/86/360_F_194828624_llDpKzFNYmi6cfHVF8GOOoAe5KTJlc9N.jpg"
@@ -169,7 +180,7 @@ export default function Profile() {
       <div className="profile-image">
         <img
           src={
-            userProfile.profilePicture.startsWith("http") || 
+            userProfile.profilePicture.startsWith("http") ||
             userProfile.profilePicture.startsWith("data:image")
               ? userProfile.profilePicture
               : `http://localhost:5500/api/images/${userProfile.profilePicture}`
@@ -177,7 +188,8 @@ export default function Profile() {
           alt={`${userProfile.firstName}'s profile`}
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = "https://cdn-icons-png.flaticon.com/512/147/147285.png";
+            e.target.src =
+              "https://cdn-icons-png.flaticon.com/512/147/147285.png";
           }}
         />
       </div>
@@ -211,6 +223,6 @@ export default function Profile() {
           />
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

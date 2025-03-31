@@ -3,6 +3,7 @@ import "../styles/ReviewSubmission.css";
 import { FaStar } from "react-icons/fa";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const ReviewSubmission = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const ReviewSubmission = () => {
   });
   const [photos, setPhotos] = useState([]);
   const [photoDataUrls, setPhotoDataUrls] = useState([]);
-  const [userId, setUserId] = useState(""); 
+  const [userId, setUserId] = useState("");
   const [userRole, setUserRole] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -78,15 +79,15 @@ const ReviewSubmission = () => {
   const handlePhotoUpload = (e) => {
     const files = Array.from(e.target.files);
     setPhotos(files);
-    
+
     // Clear previous preview URLs
     setPhotoDataUrls([]);
-    
+
     // Generate preview URLs for all selected files
-    files.forEach(file => {
+    files.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setPhotoDataUrls(prevUrls => [...prevUrls, e.target.result]);
+        setPhotoDataUrls((prevUrls) => [...prevUrls, e.target.result]);
       };
       reader.readAsDataURL(file);
     });
@@ -100,20 +101,20 @@ const ReviewSubmission = () => {
   const uploadSingleImage = async (file, index) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = async (event) => {
         try {
           const dataUrl = event.target.result;
           const matches = dataUrl.match(/^data:(.+);base64,(.+)$/);
-          
+
           if (!matches || matches.length !== 3) {
             reject(new Error("Invalid image format"));
             return;
           }
-          
+
           const imageType = matches[1];
           const base64Data = matches[2];
-          
+
           const uploadResponse = await axios.post(
             "http://localhost:5500/api/upload",
             {
@@ -124,7 +125,7 @@ const ReviewSubmission = () => {
               },
             }
           );
-          
+
           if (uploadResponse.data.success) {
             resolve(uploadResponse.data.imageId);
           } else {
@@ -135,7 +136,7 @@ const ReviewSubmission = () => {
           reject(error);
         }
       };
-      
+
       reader.onerror = () => reject(new Error("Error reading file"));
       reader.readAsDataURL(file);
     });
@@ -164,20 +165,22 @@ const ReviewSubmission = () => {
     try {
       setIsLoading(true);
       setUploadProgress(0);
-      
+
       // Upload all photos in parallel
       const photoIds = [];
       const totalPhotos = photos.length;
-      
+
       if (totalPhotos > 0) {
         const uploadPromises = photos.map((file, index) => {
-          return uploadSingleImage(file, index).then(imageId => {
+          return uploadSingleImage(file, index).then((imageId) => {
             photoIds.push(imageId);
-            setUploadProgress(Math.round((photoIds.length / totalPhotos) * 100));
+            setUploadProgress(
+              Math.round((photoIds.length / totalPhotos) * 100)
+            );
             return imageId;
           });
         });
-        
+
         // Wait for all uploads to complete
         await Promise.all(uploadPromises);
       }
@@ -204,7 +207,7 @@ const ReviewSubmission = () => {
       );
 
       console.log(response.data);
-      
+
       setIsLoading(false);
       setUploadProgress(0);
       alert("Review submitted successfully!");
@@ -228,12 +231,17 @@ const ReviewSubmission = () => {
 
   // Remove a photo from the selection
   const removePhoto = (index) => {
-    setPhotos(prev => prev.filter((_, i) => i !== index));
-    setPhotoDataUrls(prev => prev.filter((_, i) => i !== index));
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+    setPhotoDataUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
-    <div className="review-submission-container">
+    <motion.div
+      className="review-submission-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <h1>Submit Your Review</h1>
       {error && <div className="error-message">{error}</div>}
 
@@ -333,20 +341,20 @@ const ReviewSubmission = () => {
               accept="image/*"
               onChange={handlePhotoUpload}
             />
-            
+
             {/* Photo previews */}
             {photoDataUrls.length > 0 && (
               <div className="photo-upload-container">
                 <div className="photo-previews">
                   {photoDataUrls.map((url, index) => (
                     <div key={index} className="photo-preview-item">
-                      <img 
+                      <img
                         src={url}
                         alt={`Preview ${index + 1}`}
                         className="photo-preview-thumbnail"
                       />
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="remove-photo-btn"
                         onClick={() => removePhoto(index)}
                       >
@@ -356,17 +364,18 @@ const ReviewSubmission = () => {
                   ))}
                 </div>
                 <div className="photo-count">
-                  {photoDataUrls.length} photo{photoDataUrls.length !== 1 ? 's' : ''} selected
+                  {photoDataUrls.length} photo
+                  {photoDataUrls.length !== 1 ? "s" : ""} selected
                 </div>
               </div>
             )}
-            
+
             {/* Upload progress indicator */}
             {isLoading && uploadProgress > 0 && (
               <div className="upload-progress">
                 <div className="progress-bar">
-                  <div 
-                    className="progress-fill" 
+                  <div
+                    className="progress-fill"
                     style={{ width: `${uploadProgress}%` }}
                   ></div>
                 </div>
@@ -390,7 +399,7 @@ const ReviewSubmission = () => {
           Only students are allowed to submit reviews.
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

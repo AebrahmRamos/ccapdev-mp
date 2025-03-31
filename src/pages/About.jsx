@@ -1,19 +1,26 @@
-import '../styles/About.css';
+import "../styles/About.css";
+import { motion } from "framer-motion";
 
 const About = () => {
   return (
-    <div className="about-container">
+    <motion.div
+      className="about-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <h1>About DLSU Coffee Crawl</h1>
       <div className="about-content">
         <section className="mission">
           <h2>Our Mission</h2>
           <p>
-            DLSU Coffee Crawl is dedicated to helping students, faculty, and coffee enthusiasts
-            discover the best coffee spots around De La Salle University. We believe that great
-            coffee enhances productivity and creates memorable experiences.
+            DLSU Coffee Crawl is dedicated to helping students, faculty, and
+            coffee enthusiasts discover the best coffee spots around De La Salle
+            University. We believe that great coffee enhances productivity and
+            creates memorable experiences.
           </p>
         </section>
-        
+
         <section className="features">
           <h2>What We Offer</h2>
           <ul>
@@ -24,7 +31,7 @@ const About = () => {
           </ul>
         </section>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
