@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Login.css";
+import { motion } from "framer-motion";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -55,7 +56,12 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
+    <motion.div
+      className="login-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <div className="login-box">
         <h1>Welcome Back</h1>
         <form onSubmit={handleSubmit}>
@@ -90,7 +96,7 @@ const Login = () => {
           Don&apos;t have an account? <a href="/signup">Sign up</a>
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

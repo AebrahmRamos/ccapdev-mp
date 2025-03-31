@@ -1,7 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import "../styles/Signup.css";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -37,7 +38,8 @@ const Signup = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  const operatingHoursRegex = /^((\d{1,2}(:\d{2})? (AM|PM) - \d{1,2}(:\d{2})? (AM|PM))|Closed)$/i;
+  const operatingHoursRegex =
+    /^((\d{1,2}(:\d{2})? (AM|PM) - \d{1,2}(:\d{2})? (AM|PM))|Closed)$/i;
 
   const validateOperatingHours = (value) => {
     if (!value) return "";
@@ -94,7 +96,9 @@ const Signup = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "password") {
-      setPasswordError(value.length < 6 ? "Password must be at least 6 characters long." : "");
+      setPasswordError(
+        value.length < 6 ? "Password must be at least 6 characters long." : ""
+      );
     }
     if (name.startsWith("operatingHours.")) {
       const day = name.split(".")[1];
@@ -156,7 +160,7 @@ const Signup = () => {
         if (response.status === 201) {
           console.log("Signup successful:", response.data);
           alert(`Sign-up successful as ${formData.role}!`);
-          navigate('/login');
+          navigate("/login");
         } else {
           console.log("Signup failed:", response.data.message);
           setErrorMessage(response.data.message);
@@ -166,13 +170,19 @@ const Signup = () => {
       }
     } catch (error) {
       console.error("An error occurred:", error);
-      const errorMsg = error.response?.data?.message || "An error occurred. Please try again.";
+      const errorMsg =
+        error.response?.data?.message || "An error occurred. Please try again.";
       setErrorMessage(errorMsg);
     }
   };
 
   return (
-    <div className="signup-container">
+    <motion.div
+      className="signup-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <div className="signup-box">
         <h1>Create an Account</h1>
         <form onSubmit={handleSubmit}>
@@ -279,7 +289,9 @@ const Signup = () => {
                       placeholder="9 AM - 5 PM or Closed"
                     />
                     {operatingHoursErrors.Monday && (
-                      <p className="error-message">{operatingHoursErrors.Monday}</p>
+                      <p className="error-message">
+                        {operatingHoursErrors.Monday}
+                      </p>
                     )}
                   </div>
                   <div className="day-hours">
@@ -293,7 +305,9 @@ const Signup = () => {
                       placeholder="9 AM - 5 PM or Closed"
                     />
                     {operatingHoursErrors.Tuesday && (
-                      <p className="error-message">{operatingHoursErrors.Tuesday}</p>
+                      <p className="error-message">
+                        {operatingHoursErrors.Tuesday}
+                      </p>
                     )}
                   </div>
                   <div className="day-hours">
@@ -307,7 +321,9 @@ const Signup = () => {
                       placeholder="9 AM - 5 PM or Closed"
                     />
                     {operatingHoursErrors.Wednesday && (
-                      <p className="error-message">{operatingHoursErrors.Wednesday}</p>
+                      <p className="error-message">
+                        {operatingHoursErrors.Wednesday}
+                      </p>
                     )}
                   </div>
                   <div className="day-hours">
@@ -321,7 +337,9 @@ const Signup = () => {
                       placeholder="9 AM - 5 PM or Closed"
                     />
                     {operatingHoursErrors.Thursday && (
-                      <p className="error-message">{operatingHoursErrors.Thursday}</p>
+                      <p className="error-message">
+                        {operatingHoursErrors.Thursday}
+                      </p>
                     )}
                   </div>
                   <div className="day-hours">
@@ -335,7 +353,9 @@ const Signup = () => {
                       placeholder="9 AM - 5 PM or Closed"
                     />
                     {operatingHoursErrors.Friday && (
-                      <p className="error-message">{operatingHoursErrors.Friday}</p>
+                      <p className="error-message">
+                        {operatingHoursErrors.Friday}
+                      </p>
                     )}
                   </div>
                   <div className="day-hours">
@@ -349,7 +369,9 @@ const Signup = () => {
                       placeholder="9 AM - 5 PM or Closed"
                     />
                     {operatingHoursErrors.Saturday && (
-                      <p className="error-message">{operatingHoursErrors.Saturday}</p>
+                      <p className="error-message">
+                        {operatingHoursErrors.Saturday}
+                      </p>
                     )}
                   </div>
                   <div className="day-hours">
@@ -363,7 +385,9 @@ const Signup = () => {
                       placeholder="9 AM - 5 PM or Closed"
                     />
                     {operatingHoursErrors.Sunday && (
-                      <p className="error-message">{operatingHoursErrors.Sunday}</p>
+                      <p className="error-message">
+                        {operatingHoursErrors.Sunday}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -382,7 +406,7 @@ const Signup = () => {
           Already have an account? <a href="/login">Log in</a>
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

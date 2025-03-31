@@ -3,7 +3,13 @@ import styles from "../styles/CafeDetails.module.css";
 import { ReviewCard } from "./ReviewCard";
 
 export function ReviewsSection({ reviews, isProfilePage, onEdit, onDelete }) {
-  console.log("ReviewsSection props:", { reviews, isProfilePage, onEdit, onDelete });
+  console.log("ReviewsSection props:", {
+    reviews,
+    isProfilePage,
+    onEdit,
+    onDelete,
+  });
+
   return (
     <div className={styles.reviewsSection}>
       <h2 className={styles.reviewsTitle}>Reviews</h2>
@@ -30,5 +36,5 @@ ReviewsSection.propTypes = {
   reviews: PropTypes.arrayOf(PropTypes.shape(ReviewCard.propTypes)).isRequired,
   isProfilePage: PropTypes.bool,
   onEdit: PropTypes.func,
-  onDelete: PropTypes.func
+  onDelete: PropTypes.func,
 };

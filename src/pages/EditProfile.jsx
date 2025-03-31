@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/EditProfile.css";
+import { motion } from "framer-motion";
 
 export default function EditProfile() {
   const [profileDetails, setProfileDetails] = useState({
@@ -58,15 +59,15 @@ export default function EditProfile() {
         alert("User data not found. Please log in again.");
         return;
       }
-  
+
       let profilePicture = profileDetails.profilePic;
-  
+
       // Handle image upload if new image was selected
       if (profilePicture.startsWith("data:image")) {
         const matches = profilePicture.match(/^data:(.+);base64,(.+)$/);
         const imageType = matches[1];
         const base64Data = matches[2];
-  
+
         // Upload image
         const uploadResponse = await axios.post(
           "http://localhost:5500/api/upload",
@@ -78,14 +79,14 @@ export default function EditProfile() {
             },
           }
         );
-  
+
         if (uploadResponse.data.success) {
           profilePicture = uploadResponse.data.imageId;
         } else {
           throw new Error("Failed to upload image");
         }
       }
-  
+
       // Update user data
       const response = await axios.put(
         `http://localhost:5500/api/users/${userData._id}`,
@@ -102,18 +103,18 @@ export default function EditProfile() {
           },
         }
       );
-  
+
       if (response.status === 200) {
         // Update local storage with new data
         const updatedUser = response.data.user;
         localStorage.setItem("userData", JSON.stringify(updatedUser));
-        
+
         // Update local state with new image URL if needed
-        setProfileDetails(prev => ({
+        setProfileDetails((prev) => ({
           ...prev,
           profilePic: updatedUser.profilePicture,
         }));
-  
+
         alert("Profile updated successfully!");
       }
     } catch (error) {
@@ -123,7 +124,12 @@ export default function EditProfile() {
   };
 
   return (
-    <div className="edit-profile-page-container">
+    <motion.div
+      className="edit-profile-page-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <h1>Edit Your Profile</h1>
       <form onSubmit={handleSubmit}>
         <div className="profile-pic-section">
@@ -185,6 +191,6 @@ export default function EditProfile() {
           Save Changes
         </button>
       </form>
-    </div>
+    </motion.div>
   );
 }

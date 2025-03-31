@@ -5,6 +5,7 @@ import { CafeDetails } from "../components/CafeDetails";
 import { ImageGallery } from "../components/ImageGallery";
 import CafeReviewSection from "../components/CafeReviewSection";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 export default function CafePage() {
   const { slug } = useParams();
@@ -20,7 +21,9 @@ export default function CafePage() {
 
       try {
         // Fetch cafe data
-        const cafeResponse = await axios.get(`http://localhost:5500/api/cafes/${slug}`);
+        const cafeResponse = await axios.get(
+          `http://localhost:5500/api/cafes/${slug}`
+        );
         const cafeData = cafeResponse.data;
         setCafe(cafeData);
 
@@ -43,7 +46,8 @@ export default function CafePage() {
 
   const getImageUrl = (image) => {
     if (!image) return "/images/default-cafe-image.jpg";
-    if (image.startsWith("http") || image.startsWith("data:image")) return image;
+    if (image.startsWith("http") || image.startsWith("data:image"))
+      return image;
     return `http://localhost:5500/api/images/${image}`;
   };
 
@@ -52,7 +56,12 @@ export default function CafePage() {
   if (!cafe) return <div className={styles.error}>Cafe not found</div>;
 
   return (
-    <div className={styles.cafeDetailsPage}>
+    <motion.div
+      className={styles.cafeDetailsPage}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <CafeDetails
         cafeName={cafe.cafeName}
         totalReviews={cafe.totalReviews || 0}
@@ -63,6 +72,6 @@ export default function CafePage() {
       />
       <ImageGallery images={cafe.photos?.map(getImageUrl) || []} />
       <CafeReviewSection reviews={reviews} />
-    </div>
+    </motion.div>
   );
 }

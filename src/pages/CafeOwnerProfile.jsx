@@ -3,6 +3,7 @@ import "../styles/CafeOwnerProfile.css";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import api from "../utils/axiosConfig";
+import { motion } from "framer-motion";
 
 export default function CafeOwnerProfile() {
   const navigate = useNavigate();
@@ -66,7 +67,8 @@ export default function CafeOwnerProfile() {
 
   const getImageUrl = (image) => {
     if (!image) return "https://cdn-icons-png.flaticon.com/512/147/147285.png";
-    if (image.startsWith("http") || image.startsWith("data:image")) return image;
+    if (image.startsWith("http") || image.startsWith("data:image"))
+      return image;
     return `http://localhost:5500/api/images/${image}`;
   };
 
@@ -75,7 +77,12 @@ export default function CafeOwnerProfile() {
   if (!ownerData) return <p>No profile data available</p>;
 
   return (
-    <div className="profile">
+    <motion.div
+      className="profile"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <div className="profile-cover">
         <img src={ownerData.coverImage} alt="profile cover" />
         <div className="profile-image">
@@ -84,7 +91,8 @@ export default function CafeOwnerProfile() {
             alt={`${ownerData.name}'s profile`}
             onError={(e) => {
               e.target.onerror = null;
-              e.target.src = "https://cdn-icons-png.flaticon.com/512/147/147285.png";
+              e.target.src =
+                "https://cdn-icons-png.flaticon.com/512/147/147285.png";
             }}
           />
         </div>
@@ -131,12 +139,14 @@ export default function CafeOwnerProfile() {
                 <div className="hours-section">
                   <h3>Opening Hours:</h3>
                   <div className="hours-list">
-                    {Object.entries(cafeData.operatingHours).map(([day, hours]) => (
-                      <div key={day} className="hours-item">
-                        <span className="day">{day}</span>
-                        <span className="time">{hours || "Closed"}</span>
-                      </div>
-                    ))}
+                    {Object.entries(cafeData.operatingHours).map(
+                      ([day, hours]) => (
+                        <div key={day} className="hours-item">
+                          <span className="day">{day}</span>
+                          <span className="time">{hours || "Closed"}</span>
+                        </div>
+                      )
+                    )}
                   </div>
                 </div>
               </div>
@@ -174,6 +184,6 @@ export default function CafeOwnerProfile() {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
