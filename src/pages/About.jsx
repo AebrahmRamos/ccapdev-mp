@@ -8,12 +8,23 @@ const About = () => {
   const libraries = [
     "React",
     "Framer Motion",
+    "React Router DOM",
     "React Router",
     "Axios",
     "Bootstrap",
     "Node.js",
     "Express",
     "MongoDB",
+    "Mongoose",
+    "bycrypt",
+    "jsonwebtoken",
+    "dotenv",
+    "lodash",
+    "prop-types",
+    "cors",
+    "react-icons",
+    "jwt-decode",
+    "express-validator",
   ];
 
   const toggleLibraries = () => {

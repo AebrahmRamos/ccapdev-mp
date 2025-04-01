@@ -197,12 +197,12 @@ h1::after {
 }
 
 .libraries ul.show {
-  max-height: 500px; /* Adjust based on content */
+  max-height: 900px; /* Adjust based on content */
   opacity: 1; /* Fully visible when expanded */
 }
 
 .libraries li {
-  padding: 0.8rem 1rem;
+  padding: 0.2rem 1rem;
   margin: 0.5rem 0;
   background: var(--primary-color);
   color: white;
