@@ -6,29 +6,32 @@ import Login from "../pages/Login";
 import CafePage from "../pages/CafePage";
 import ReviewSubmission from "../pages/ReviewSubmission";
 import CafeListing from "../pages/CafeListing";
-
 import Profile from "../pages/Profile";
 import EditProfile from "../pages/EditProfile";
 import EditCafe from "../pages/EditCafe";
 import PrivateRoute from "../components/PrivateRoute";
 import CafeOwnerProfile from "../pages/CafeOwnerProfile";
 import NotFound from "../pages/NotFound";
-
 import { AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
 function AnimatedRoutes() {
   const [userData, setUserData] = useState(null);
+  const [routeKey, setRouteKey] = useState(Date.now());
+
   useEffect(() => {
     const storedUserData = localStorage.getItem("userData");
     if (storedUserData) {
       setUserData(JSON.parse(storedUserData));
+      setRouteKey(Date.now());
     }
   }, []);
+
   const location = useLocation();
+
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.key}>
+      <Routes location={location} key={routeKey}> {/* Use routeKey as key */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
@@ -41,18 +44,8 @@ function AnimatedRoutes() {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/cafe"
-          element={
-              <CafeListing />
-          }
-        />
-        <Route
-          path="/cafe/:slug"
-          element={
-              <CafePage />
-          }
-        />
+        <Route path="/cafe" element={<CafeListing />} />
+        <Route path="/cafe/:slug" element={<CafePage />} />
         <Route
           path="/edit-profile"
           element={
@@ -73,15 +66,7 @@ function AnimatedRoutes() {
           path="/profile"
           element={
             <PrivateRoute>
-              {userData ? (
-                userData.role === "Student" ? (
-                  <Profile />
-                ) : (
-                  <CafeOwnerProfile />
-                )
-              ) : (
-                <Login />
-              )}
+              {userData?.role === "Student" ? <Profile /> : <CafeOwnerProfile />}
             </PrivateRoute>
           }
         />

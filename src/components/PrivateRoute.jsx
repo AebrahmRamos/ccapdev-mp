@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 
 const PrivateRoute = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
     // Small delay to ensure localStorage is checked after hydration
     const timer = setTimeout(() => {
