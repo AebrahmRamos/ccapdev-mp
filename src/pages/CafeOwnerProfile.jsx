@@ -69,7 +69,7 @@ export default function CafeOwnerProfile() {
     if (!image) return "https://cdn-icons-png.flaticon.com/512/147/147285.png";
     if (image.startsWith("http") || image.startsWith("data:image"))
       return image;
-    return `http://localhost:5500/api/images/${image}`;
+    return `https://coffee-crawl-ccapdev.vercel.app/api/images/${image}`;
   };
 
   if (loading) return <p>Loading profile...</p>;

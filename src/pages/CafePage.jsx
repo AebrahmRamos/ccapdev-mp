@@ -22,14 +22,14 @@ export default function CafePage() {
       try {
         // Fetch cafe data
         const cafeResponse = await axios.get(
-          `http://localhost:5500/api/cafes/${slug}`
+          `https://coffee-crawl-ccapdev.vercel.app/api/cafes/${slug}`
         );
         const cafeData = cafeResponse.data;
         setCafe(cafeData);
 
         // Fetch reviews using the cafe's _id
         const reviewsResponse = await axios.get(
-          `http://localhost:5500/api/reviews/cafe/${cafeData._id}`
+          `https://coffee-crawl-ccapdev.vercel.app/api/reviews/cafe/${cafeData._id}`
         );
         const reviewsData = reviewsResponse.data;
         setReviews(reviewsData);
@@ -48,7 +48,7 @@ export default function CafePage() {
     if (!image) return "/images/default-cafe-image.jpg";
     if (image.startsWith("http") || image.startsWith("data:image"))
       return image;
-    return `http://localhost:5500/api/images/${image}`;
+    return `https://coffee-crawl-ccapdev.vercel.app/api/images/${image}`;
   };
 
   if (loading) return <div className={styles.loading}>Loading...</div>;

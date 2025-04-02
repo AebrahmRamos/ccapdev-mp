@@ -12,6 +12,7 @@ import EditProfile from "../pages/EditProfile";
 import EditCafe from "../pages/EditCafe";
 import PrivateRoute from "../components/PrivateRoute";
 import CafeOwnerProfile from "../pages/CafeOwnerProfile";
+import NotFound from "../pages/NotFound";
 
 import { AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
@@ -43,17 +44,13 @@ function AnimatedRoutes() {
         <Route
           path="/cafe"
           element={
-            <PrivateRoute>
               <CafeListing />
-            </PrivateRoute>
           }
         />
         <Route
           path="/cafe/:slug"
           element={
-            <PrivateRoute>
               <CafePage />
-            </PrivateRoute>
           }
         />
         <Route
@@ -96,6 +93,7 @@ function AnimatedRoutes() {
             </PrivateRoute>
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
   );

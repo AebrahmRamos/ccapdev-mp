@@ -24,7 +24,7 @@ const TrendingCafes = () => {
       setError(null);
 
       try {
-        const response = await axios.get("http://localhost:5500/api/cafes");
+        const response = await axios.get("https://coffee-crawl-ccapdev.vercel.app/api/cafes");
         const cafes = response.data;
 
         // Calculate trending cafes based on review metrics
@@ -52,7 +52,7 @@ const TrendingCafes = () => {
     if (!image) return "/images/default-cafe-image.jpg";
     if (image.startsWith("http") || image.startsWith("data:image"))
       return image;
-    return `http://localhost:5500/api/images/${image}`;
+    return `https://coffee-crawl-ccapdev.vercel.app/api/images/${image}`;
   };
 
   if (error) {

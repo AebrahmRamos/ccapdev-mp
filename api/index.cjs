@@ -19,7 +19,10 @@ const app = express();
 const port = process.env.PORT || 5500;
 
 // Middleware
-app.use(cors({ origin: process.env.ALLOWED_ORIGINS || "*" })); // Restrict CORS in production
+app.use(cors({ 
+  origin: ['https://coffee-crawl-ccapdev.vercel.app', 'http://localhost:5173', 'http://localhost:3000'],
+  credentials: true
+}));
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 
@@ -689,6 +692,13 @@ app.get("/api/images/:id", (req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port: ${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`Server is running on port: ${port}`);
+// });
+
+module.exports = app;
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, () => {
+    console.log(`Server is running on port: ${port}`);
+  });
+}

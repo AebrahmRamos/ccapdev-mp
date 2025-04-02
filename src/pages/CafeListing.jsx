@@ -34,7 +34,7 @@ export default function CafeListing() {
       setError(null);
 
       try {
-        const response = await axios.get("http://localhost:5500/api/cafes");
+        const response = await axios.get("https://coffee-crawl-ccapdev.vercel.app/api/cafes");
         setCafes(response.data); // Assuming the API returns an array of cafes
       } catch (error) {
         console.error("Failed to fetch cafes:", error);
@@ -51,7 +51,7 @@ export default function CafeListing() {
     if (!image) return "/images/default-cafe-image.jpg";
     if (image.startsWith("http") || image.startsWith("data:image"))
       return image;
-    return `http://localhost:5500/api/images/${image}`;
+    return `https://coffee-crawl-ccapdev.vercel.app/api/images/${image}`;
   };
 
   const filteredCafes = cafes

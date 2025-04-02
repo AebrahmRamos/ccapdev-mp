@@ -26,3 +26,4 @@ config.env
 *.env
 .env
 server/config.env
+.vercel

@@ -70,7 +70,7 @@ export default function EditProfile() {
 
         // Upload image
         const uploadResponse = await axios.post(
-          "http://localhost:5500/api/upload",
+          "https://coffee-crawl-ccapdev.vercel.app/api/upload",
           {
             image: {
               name: `profile-${Date.now()}`,
@@ -89,7 +89,7 @@ export default function EditProfile() {
 
       // Update user data
       const response = await axios.put(
-        `http://localhost:5500/api/users/${userData._id}`,
+        `https://coffee-crawl-ccapdev.vercel.app/api/users/${userData._id}`,
         {
           firstName: profileDetails.firstName,
           lastName: profileDetails.lastName,

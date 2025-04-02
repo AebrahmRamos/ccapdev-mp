@@ -26,7 +26,7 @@ const ImageUpload = () => {
     const name = selectedFile.name;
 
     try {
-      const response = await fetch("http://localhost:5500/api/upload", {
+      const response = await fetch("https://coffee-crawl-ccapdev.vercel.app/api/upload", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +52,7 @@ const ImageUpload = () => {
     }
   };
   const retrieveImage = async (id) => {
-    const response = await fetch(`http://localhost:5500/api/images/${id}`);
+    const response = await fetch(`https://coffee-crawl-ccapdev.vercel.app/api/images/${id}`);
     if (response.ok) {
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);

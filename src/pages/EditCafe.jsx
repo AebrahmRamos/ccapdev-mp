@@ -25,7 +25,7 @@ export default function EditCafe() {
   useEffect(() => {
     const fetchCafeData = async () => {
       try {
-        const response = await axios.get("http://localhost:5500/api/cafe", {
+        const response = await axios.get("https://coffee-crawl-ccapdev.vercel.app/api/cafe", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
@@ -77,7 +77,7 @@ export default function EditCafe() {
       reader.readAsDataURL(file);
       reader.onloadend = async () => {
         const base64Data = reader.result.split(",")[1];
-        const uploadResponse = await axios.post("http://localhost:5500/api/upload", {
+        const uploadResponse = await axios.post("https://coffee-crawl-ccapdev.vercel.app/api/upload", {
           image: {
             name: `logo-${Date.now()}`,
             type: file.type,
@@ -121,7 +121,7 @@ export default function EditCafe() {
         return new Promise((resolve) => {
           reader.onloadend = async () => {
             const base64Data = reader.result.split(",")[1];
-            const uploadResponse = await axios.post("http://localhost:5500/api/upload", {
+            const uploadResponse = await axios.post("https://coffee-crawl-ccapdev.vercel.app/api/upload", {
               image: {
                 name: `cafe-photo-${Date.now()}`,
                 type: file.type,
@@ -163,7 +163,7 @@ export default function EditCafe() {
 
     try {
       const response = await axios.put(
-        `http://localhost:5500/api/cafes/${cafeDetails.slug}`,
+        `https://coffee-crawl-ccapdev.vercel.app/api/cafes/${cafeDetails.slug}`,
         {
           cafeName: cafeDetails.name,
           address: cafeDetails.address,
@@ -194,7 +194,7 @@ export default function EditCafe() {
   const getImageUrl = (image) => {
     if (!image) return "/images/default-cafe-logo.png";
     if (image.startsWith("http") || image.startsWith("data:image")) return image;
-    return `http://localhost:5500/api/images/${image}`;
+    return `https://coffee-crawl-ccapdev.vercel.app/api/images/${image}`;
   };
 
   return (

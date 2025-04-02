@@ -6,7 +6,14 @@ import { EditReviewForm } from "./EditReviewForm";
 const getImageUrl = (image) => {
   if (!image) return "/images/default-profile.png";
   if (image.startsWith("http") || image.startsWith("data:image")) return image;
-  return `http://localhost:5500/api/images/${image}`;
+  
+  // Determine if we're in production or development
+  const isProduction = window.location.hostname !== 'localhost';
+  const baseURL = isProduction 
+    ? 'https://coffee-crawl-ccapdev.vercel.app'
+    : 'http://localhost:5500';
+    
+  return `${baseURL}/api/images/${image}`;
 };
 
 export function ReviewCard({

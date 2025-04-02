@@ -38,7 +38,7 @@ const ReviewSubmission = () => {
   useEffect(() => {
     const fetchCafes = async () => {
       try {
-        const response = await axios.get("http://localhost:5500/api/cafes");
+        const response = await axios.get("https://coffee-crawl-ccapdev.vercel.app/api/cafes");
         setCafes(response.data);
       } catch (err) {
         console.error("Error fetching cafes:", err);
@@ -116,7 +116,7 @@ const ReviewSubmission = () => {
           const base64Data = matches[2];
 
           const uploadResponse = await axios.post(
-            "http://localhost:5500/api/upload",
+            "https://coffee-crawl-ccapdev.vercel.app/api/upload",
             {
               image: {
                 name: `review-${Date.now()}-${index}`,
@@ -197,7 +197,7 @@ const ReviewSubmission = () => {
 
       // Submit review
       const response = await axios.post(
-        "http://localhost:5500/api/reviews",
+        "https://coffee-crawl-ccapdev.vercel.app/api/reviews",
         reviewData,
         {
           headers: {

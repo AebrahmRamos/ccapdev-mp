@@ -183,7 +183,7 @@ export default function Profile() {
             userProfile.profilePicture.startsWith("http") ||
             userProfile.profilePicture.startsWith("data:image")
               ? userProfile.profilePicture
-              : `http://localhost:5500/api/images/${userProfile.profilePicture}`
+              : `https://coffee-crawl-ccapdev.vercel.app/api/images/${userProfile.profilePicture}`
           }
           alt={`${userProfile.firstName}'s profile`}
           onError={(e) => {

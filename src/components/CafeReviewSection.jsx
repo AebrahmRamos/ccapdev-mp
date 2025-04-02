@@ -7,7 +7,9 @@ import { EditReviewForm } from "./EditReviewForm";
 const getImageUrl = (image) => {
   if (!image) return "/images/default-profile.png";
   if (image.startsWith("http") || image.startsWith("data:image")) return image;
-  return `http://localhost:5500/api/images/${image}`;
+  
+  // Use the same base URL as your API
+  return `https://coffee-crawl-ccapdev.vercel.app/api/images/${image}`;
 };
 
 function ReviewCard({

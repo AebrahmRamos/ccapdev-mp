@@ -146,9 +146,9 @@ const Signup = () => {
       };
 
       if (formData.role === "Student") {
-        signupEndpoint = "http://localhost:5500/api/signup/student";
+        signupEndpoint = "https://coffee-crawl-ccapdev.vercel.app/api/signup/student";
       } else if (formData.role === "Cafe Owner") {
-        signupEndpoint = "http://localhost:5500/api/signup/cafe-owner";
+        signupEndpoint = "https://coffee-crawl-ccapdev.vercel.app/api/signup/cafe-owner";
         signupData.cafeName = formData.cafeName;
         signupData.address = formData.address;
         signupData.operatingHours = formData.operatingHours;

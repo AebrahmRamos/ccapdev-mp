@@ -1,10 +1,22 @@
 import axios from 'axios';
 
-const API_URL = "http://localhost:5500";
+// Determine if we're in production or development
+// const isProduction = window.location.hostname !== 'localhost';
+
+// Use the appropriate base URL
+// const baseURL = isProduction 
+//   ? 'https://coffee-crawl-ccapdev.vercel.app' // Your Vercel app URL
+//   : 'http://localhost:5500';
+
+const baseURL = 'https://coffee-crawl-ccapdev.vercel.app';
+console.log('Using hardcoded API base URL:', baseURL);
 
 const api = axios.create({
-  baseURL: API_URL
+  baseURL,
+  withCredentials: true
 });
+
+console.log('API Base URL:', baseURL);
 
 // Add interceptor to add auth token to requests
 api.interceptors.request.use(
